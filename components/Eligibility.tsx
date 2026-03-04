@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ELIGIBILITY, BONUS_TARGETS } from "@/lib/constants";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { CheckCircle2, ChevronDown, Star } from "lucide-react";
@@ -8,6 +8,16 @@ import { CheckCircle2, ChevronDown, Star } from "lucide-react";
 export default function Eligibility() {
   const [bonusOpen, setBonusOpen] = useState(false);
   const { ref, visible } = useScrollReveal(0.1);
+  const bonusRef = useRef<HTMLDivElement>(null);
+  const [bonusHeight, setBonusHeight] = useState(0);
+
+  const measure = useCallback(() => {
+    if (bonusRef.current) setBonusHeight(bonusRef.current.scrollHeight);
+  }, []);
+
+  useEffect(() => {
+    measure();
+  }, [bonusOpen, measure]);
 
   return (
     <section id="eligibility" className="py-16 md:py-20" ref={ref}>
@@ -15,7 +25,7 @@ export default function Eligibility() {
         <h2 className={`mb-4 text-center text-2xl font-bold text-primary-900 md:text-3xl transition-all duration-700 ${visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
           지원 자격
         </h2>
-        <p className={`mb-12 text-center text-gray-600 transition-all duration-700 delay-100 ${visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
+        <p className={`mb-12 text-center text-gray-500 transition-all duration-700 delay-100 ${visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
           아래 조건을 모두 충족하는 분이 지원 가능합니다
         </p>
 
@@ -26,30 +36,40 @@ export default function Eligibility() {
               className={`flex items-start gap-3 rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-700 ${visible ? "translate-x-0 opacity-100" : "-translate-x-8 opacity-0"}`}
               style={{ transitionDelay: `${200 + idx * 120}ms` }}
             >
-              <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
+              <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-green-500" aria-hidden="true" />
               <p className="text-gray-700">{item}</p>
             </div>
           ))}
 
           <button
             onClick={() => setBonusOpen(!bonusOpen)}
+            aria-expanded={bonusOpen}
+            aria-controls="bonus-targets-panel"
             className="flex w-full items-center justify-between rounded-xl border border-primary-100 bg-primary-50 p-4 text-left transition-colors hover:bg-primary-100"
           >
             <div className="flex items-center gap-3">
-              <Star className="h-5 w-5 shrink-0 text-accent" />
+              <Star className="h-5 w-5 shrink-0 text-accent" aria-hidden="true" />
               <span className="font-medium text-primary-800">
                 가점 대상 확인하기
               </span>
             </div>
             <ChevronDown
-              className={`h-5 w-5 text-primary-600 transition-transform ${
+              className={`h-5 w-5 text-primary-600 transition-transform duration-300 ${
                 bonusOpen ? "rotate-180" : ""
               }`}
             />
           </button>
 
-          {bonusOpen && (
-            <div className="rounded-xl border border-primary-100 bg-primary-50/50 p-5">
+          <div
+            id="bonus-targets-panel"
+            role="region"
+            className="overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out"
+            style={{
+              maxHeight: bonusOpen ? bonusHeight : 0,
+              opacity: bonusOpen ? 1 : 0,
+            }}
+          >
+            <div ref={bonusRef} className="rounded-xl border border-primary-100 bg-primary-50/50 p-5">
               <p className="mb-3 text-sm font-medium text-primary-800">
                 아래 해당자는 선발 시 가점이 부여됩니다.
               </p>
@@ -65,7 +85,7 @@ export default function Eligibility() {
                 ))}
               </ul>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </section>

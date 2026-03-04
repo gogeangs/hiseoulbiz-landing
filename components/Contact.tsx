@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { PROGRAM } from "@/lib/constants";
 import Link from "next/link";
@@ -8,7 +10,7 @@ export default function Contact() {
   const open = isApplicationOpen();
 
   return (
-    <footer id="contact" className="bg-primary-950 py-16 text-white">
+    <footer id="contact" className="bg-primary-950 pb-24 pt-16 text-white md:pb-16">
       <div className="mx-auto max-w-6xl px-4 text-center">
         <h2 className="mb-8 text-2xl font-bold md:text-3xl">문의하기</h2>
 
@@ -29,7 +31,7 @@ export default function Contact() {
           </a>
         </div>
 
-        <p className="mb-8 text-sm text-white/50">
+        <p className="mb-8 text-sm text-white/60">
           {PROGRAM.organizer} {PROGRAM.contact.department}
         </p>
 
@@ -61,7 +63,7 @@ export default function Contact() {
               className="h-8 w-auto brightness-0 invert opacity-50"
             />
           </div>
-          <p className="text-sm text-white/30">
+          <p className="text-sm text-white/50">
             &copy; 2026 {PROGRAM.organizer}. All rights reserved.
           </p>
         </div>

@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { PROGRAM } from "@/lib/constants";
 import { APPLY_URL, isApplicationOpen } from "@/lib/utils";

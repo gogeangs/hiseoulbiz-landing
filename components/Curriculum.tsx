@@ -16,30 +16,33 @@ export default function Curriculum() {
           총 {PROGRAM.totalHours}시간, 현직자 중심 실무 교육
         </p>
 
-        {/* 가로 스크롤 카드 */}
-        <div className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-4 snap-x snap-mandatory md:mx-0 md:grid md:grid-cols-3 md:gap-5 md:overflow-visible md:px-0 md:pb-0">
-          {CURRICULUM.map((item, idx) => (
-            <div
-              key={item.title}
-              className={`flex w-64 shrink-0 snap-start flex-col rounded-2xl border border-gray-100 bg-white p-6 shadow-sm md:w-auto transition-all duration-700 ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
-              style={{ transitionDelay: `${200 + idx * 100}ms` }}
-            >
-              <span className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-primary-700 text-sm font-bold text-white">
-                {idx + 1}
-              </span>
-              <p className="mb-1 break-keep text-base font-bold text-primary-900">
-                {item.title}
-              </p>
-              {item.subtitle && (
-                <p className="mb-3 break-keep text-sm text-gray-400">
-                  {item.subtitle}
+        {/* 가로 스크롤 카드 + 스크롤 힌트 */}
+        <div className="relative md:static">
+          <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-8 bg-gradient-to-l from-gray-50 to-transparent md:hidden" />
+          <div className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-4 snap-x snap-mandatory md:mx-0 md:grid md:grid-cols-3 md:gap-5 md:overflow-visible md:px-0 md:pb-0">
+            {CURRICULUM.map((item, idx) => (
+              <div
+                key={item.title}
+                className={`flex w-64 shrink-0 snap-start flex-col rounded-2xl border border-gray-100 bg-white p-6 shadow-sm md:w-auto transition-all duration-700 ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
+                style={{ transitionDelay: `${200 + idx * 100}ms` }}
+              >
+                <span className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-primary-700 text-sm font-bold text-white">
+                  {idx + 1}
+                </span>
+                <p className="mb-1 break-keep text-base font-bold text-primary-900">
+                  {item.title}
                 </p>
-              )}
-              <span className="mt-auto text-sm font-medium text-primary-600">
-                {item.hours}시간
-              </span>
-            </div>
-          ))}
+                {item.subtitle && (
+                  <p className="mb-3 break-keep text-sm text-gray-400">
+                    {item.subtitle}
+                  </p>
+                )}
+                <span className="mt-auto text-sm font-medium text-primary-600">
+                  {item.hours}시간
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
 
         <p className="mt-8 text-center text-sm text-gray-400">

@@ -2,12 +2,20 @@
 
 import { useCountdown } from "@/hooks/useCountdown";
 import Link from "next/link";
+import { DEADLINE_ISO } from "@/lib/constants";
 import { APPLY_URL } from "@/lib/utils";
 
 export default function CountdownBanner() {
-  const { days, hours, minutes, seconds, isExpired } = useCountdown(
-    "2026-03-31T23:59:59+09:00"
-  );
+  const { days, hours, minutes, seconds, isExpired, mounted } =
+    useCountdown(DEADLINE_ISO);
+
+  if (!mounted) {
+    return (
+      <div className="bg-primary-700 py-2.5 text-center text-sm font-medium text-white">
+        &nbsp;
+      </div>
+    );
+  }
 
   if (isExpired) {
     return (

@@ -24,9 +24,20 @@ body {
 
 html {
   scroll-behavior: smooth;
+  /* sticky 헤더(64px) + 카운트다운 배너(~40px) + 여유 */
+  scroll-padding-top: 120px;
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-20px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
 }

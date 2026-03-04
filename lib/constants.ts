@@ -1,3 +1,6 @@
+/** 마감일 ISO (단일 진실 소스 — 모든 컴포넌트에서 이 값을 참조) */
+export const DEADLINE_ISO = "2026-03-31T23:59:59+09:00";
+
 export const PROGRAM = {
   title: "2026 글로벌 이커머스 & 세일즈 기획 실무 과정",
   organizer: "(사)하이서울기업협회",
