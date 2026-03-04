@@ -22,14 +22,29 @@ export function buildApplicationGuideEmail(applicantName: string): string {
           신청이 정상적으로 접수되었음을 안내드립니다.
         </p>
 
-        <div style="background:#eff6ff;border-left:4px solid #3b82f6;padding:16px 20px;border-radius:0 8px 8px 0;margin:0 0 24px;">
+        <div style="background:#eff6ff;border-left:4px solid #3b82f6;padding:16px 20px;border-radius:0 8px 8px 0;margin:0 0 16px;">
           <p style="font-size:14px;color:#1e3a5f;font-weight:600;margin:0 0 8px;">
-            서울시청 제출용 신청서 안내
+            참여신청서 작성 및 제출 안내
           </p>
           <p style="font-size:13px;color:#475569;line-height:1.7;margin:0;">
-            서울시청에 제출할 신청서를 <strong>24시간 이내</strong>에
-            기재해 주신 이메일로 별도 발송해 드릴 예정입니다.<br>
-            수신 후 안내에 따라 작성하여 회신해 주시기 바랍니다.
+            본 과정은 서울시에서 주최하는 취업연계(매력일자리) 사업으로,
+            서울시 청년정책사업 참여 여부 확인을 위해
+            <strong>첨부된 참여신청서를 작성하여 제출</strong>해 주셔야 합니다.<br><br>
+            또한 선발 면접 진행을 위해
+            <strong>자기소개서</strong>(양식 자유, A4 1장 내외)를
+            함께 제출해 주시기 바랍니다.
+          </p>
+        </div>
+
+        <div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:16px 20px;border-radius:0 8px 8px 0;margin:0 0 24px;">
+          <p style="font-size:14px;color:#92400e;font-weight:600;margin:0 0 8px;">
+            중요 안내
+          </p>
+          <p style="font-size:13px;color:#78350f;line-height:1.7;margin:0;">
+            첨부파일(참여신청서 + 자기소개서) 제출까지 완료하셔야
+            <strong>최종 접수가 완료</strong>되며,
+            이후 <strong>면접일정 안내</strong>를 받으실 수 있습니다.<br>
+            회신처: <strong>${PROGRAM.contact.email}</strong>
           </p>
         </div>
 
