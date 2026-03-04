@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { applicationSchema } from "@/lib/validations";
 import { insertApplication } from "@/lib/db";
+import { DEADLINE_ISO } from "@/lib/constants";
 
 export async function POST(request: NextRequest) {
   try {
+    // 마감일 서버 사이드 체크
+    if (new Date() > new Date(DEADLINE_ISO)) {
+      return NextResponse.json(
+        { error: "신청 기간이 마감되었습니다." },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
 
     // 서버 사이드 유효성 검증

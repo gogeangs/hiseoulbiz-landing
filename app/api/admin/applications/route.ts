@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminToken } from "@/lib/auth";
 import { insertApplication } from "@/lib/db";
-import { SEOUL_DISTRICTS } from "@/lib/validations";
+import { applicationSchema } from "@/lib/validations";
 
 export async function POST(request: NextRequest) {
   const token = request.cookies.get("admin_token")?.value;
@@ -14,30 +14,20 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { name, phone, email, birthDate, district, bonusTargets } = body;
+    const validated = applicationSchema
+      .omit({ privacyConsent: true })
+      .safeParse(body);
 
-    if (!name || !phone || !email || !birthDate || !district) {
+    if (!validated.success) {
       return NextResponse.json(
-        { error: "필수 항목을 모두 입력해 주세요." },
-        { status: 400 }
-      );
-    }
-
-    if (!SEOUL_DISTRICTS.includes(district)) {
-      return NextResponse.json(
-        { error: "유효하지 않은 지역입니다." },
+        { error: "입력 정보를 확인해 주세요.", details: validated.error.flatten() },
         { status: 400 }
       );
     }
 
     const submittedAt = new Date().toISOString();
     await insertApplication({
-      name,
-      phone,
-      email,
-      birthDate,
-      district,
-      bonusTargets: bonusTargets ?? [],
+      ...validated.data,
       submittedAt,
     });
 

@@ -81,6 +81,7 @@ export default function ApplicationTable({
   };
 
   const applyFilters = (newSearch: string, newDistrict: string) => {
+    setSelectedIds(new Set());
     const params = new URLSearchParams();
     if (newSearch) params.set("search", newSearch);
     if (newDistrict) params.set("district", newDistrict);

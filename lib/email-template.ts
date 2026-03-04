@@ -1,6 +1,11 @@
 import { PROGRAM } from "./constants";
 
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 export function buildApplicationGuideEmail(applicantName: string): string {
+  const name = escapeHtml(applicantName);
   return `<!DOCTYPE html>
 <html lang="ko">
 <head><meta charset="UTF-8"></head>
@@ -15,7 +20,7 @@ export function buildApplicationGuideEmail(applicantName: string): string {
     <tr>
       <td style="padding:32px 24px;">
         <p style="font-size:16px;color:#1e293b;margin:0 0 16px;">
-          <strong>${applicantName}</strong>님, 안녕하세요.
+          <strong>${name}</strong>님, 안녕하세요.
         </p>
         <p style="font-size:14px;color:#475569;line-height:1.8;margin:0 0 24px;">
           <strong>${PROGRAM.title}</strong>에 신청해 주셔서 감사합니다.<br>

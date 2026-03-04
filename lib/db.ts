@@ -2,7 +2,9 @@ import { neon } from "@neondatabase/serverless";
 import type { ApplicationFormData } from "./validations";
 
 function getSQL() {
-  return neon(process.env.DATABASE_URL!);
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error("DATABASE_URL is not configured");
+  return neon(url);
 }
 
 export interface ApplicationRow {
@@ -109,7 +111,7 @@ export async function getApplicationStats() {
   const [totalResult, districtResult, todayResult] = await Promise.all([
     sql`SELECT COUNT(*) as count FROM applications`,
     sql`SELECT district, COUNT(*) as count FROM applications GROUP BY district ORDER BY count DESC`,
-    sql`SELECT COUNT(*) as count FROM applications WHERE submitted_at >= CURRENT_DATE`,
+    sql`SELECT COUNT(*) as count FROM applications WHERE submitted_at >= (NOW() AT TIME ZONE 'Asia/Seoul')::date`,
   ]);
 
   return {

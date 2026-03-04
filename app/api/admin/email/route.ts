@@ -23,18 +23,25 @@ export async function POST(request: NextRequest) {
 
   try {
     const { applicationIds } = await request.json();
-    if (!Array.isArray(applicationIds) || applicationIds.length === 0) {
+    if (
+      !Array.isArray(applicationIds) ||
+      applicationIds.length === 0 ||
+      applicationIds.length > 100 ||
+      !applicationIds.every((id: unknown) => Number.isInteger(id) && (id as number) > 0)
+    ) {
       return NextResponse.json(
         { error: "발송 대상을 선택해 주세요." },
         { status: 400 }
       );
     }
 
-    const applications = await getApplicationsByIds(applicationIds);
+    const allApplications = await getApplicationsByIds(applicationIds);
+    // 이미 발송된 건 제외
+    const applications = allApplications.filter((a) => !a.email_sent_at);
     if (applications.length === 0) {
       return NextResponse.json(
-        { error: "유효한 신청 데이터가 없습니다." },
-        { status: 404 }
+        { error: "발송할 대상이 없습니다. (이미 발송 완료)" },
+        { status: 400 }
       );
     }
 

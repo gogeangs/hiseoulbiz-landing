@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { timingSafeEqual } from "crypto";
+import { createHmac } from "crypto";
 import { signAdminToken } from "@/lib/auth";
 
 function safeCompare(a: string, b: string): boolean {
-  const bufA = Buffer.from(a);
-  const bufB = Buffer.from(b);
-  if (bufA.length !== bufB.length) return false;
-  return timingSafeEqual(bufA, bufB);
+  const key = "compare";
+  const hmacA = createHmac("sha256", key).update(a).digest();
+  const hmacB = createHmac("sha256", key).update(b).digest();
+  return hmacA.equals(hmacB);
 }
 
 export async function POST(request: NextRequest) {
