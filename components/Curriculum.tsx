@@ -16,30 +16,37 @@ export default function Curriculum() {
         <h2 className="mb-4 text-center text-2xl font-bold text-primary-900 md:text-3xl">
           커리큘럼
         </h2>
-        <p className="mb-12 text-center text-gray-600">
+        <p className="mb-12 text-center text-gray-500">
           총 {PROGRAM.totalHours}시간, 현직자 중심 실무 교육
         </p>
 
         <div className="mx-auto max-w-3xl space-y-4">
           {CURRICULUM.map((item, idx) => (
-            <div key={item.title} className="rounded-xl bg-white p-5 shadow-sm">
-              <div className="mb-2 flex items-center justify-between">
-                <div>
-                  <p className="font-semibold text-primary-900">{item.title}</p>
-                  {item.subtitle && (
-                    <p className="text-sm text-gray-500">{item.subtitle}</p>
-                  )}
-                </div>
-                <span className="shrink-0 text-sm font-medium text-gray-500">
-                  {item.hours}H
-                </span>
+            <div
+              key={item.title}
+              className="flex items-center gap-5 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+            >
+              {/* 비중 표시 */}
+              <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl ${barColors[idx]} text-white`}>
+                <span className="text-lg font-bold">{item.percentage}%</span>
               </div>
-              <div className="h-3 overflow-hidden rounded-full bg-gray-100">
-                <div
-                  className={`h-full rounded-full ${barColors[idx]} transition-all`}
-                  style={{ width: `${item.percentage}%` }}
-                />
+
+              {/* 강의 정보 */}
+              <div className="min-w-0 flex-1">
+                <p className="break-keep text-lg font-bold text-primary-900">
+                  {item.title}
+                </p>
+                {item.subtitle && (
+                  <p className="mt-0.5 break-keep text-sm text-gray-500">
+                    {item.subtitle}
+                  </p>
+                )}
               </div>
+
+              {/* 시간 */}
+              <span className="shrink-0 rounded-lg bg-primary-50 px-3 py-1.5 text-sm font-semibold text-primary-700">
+                {item.hours}H
+              </span>
             </div>
           ))}
         </div>
