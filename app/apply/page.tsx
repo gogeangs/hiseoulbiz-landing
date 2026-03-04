@@ -242,7 +242,14 @@ export default function ApplyPage() {
             <p className="text-sm leading-relaxed text-gray-500">
               신청 시 입력하신 개인정보(이름, 연락처, 이메일, 생년월일, 거주지역)는
               교육생 선발 목적으로만 활용되며, 선발 완료 후 관련 법령에 따라
-              안전하게 관리됩니다.
+              안전하게 관리됩니다.{" "}
+              <Link
+                href="/privacy"
+                target="_blank"
+                className="text-primary-700 underline underline-offset-2 hover:text-primary-800"
+              >
+                개인정보처리방침
+              </Link>
             </p>
           </section>
 

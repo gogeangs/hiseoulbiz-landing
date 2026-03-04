@@ -87,6 +87,12 @@ export default function Contact() {
               className="h-8 w-auto brightness-0 invert opacity-50"
             />
           </div>
+          <Link
+            href="/privacy"
+            className="mb-3 inline-block text-sm text-white/50 underline underline-offset-2 transition-colors hover:text-white/70"
+          >
+            개인정보처리방침
+          </Link>
           <p className="text-sm text-white/50">
             &copy; 2026 {PROGRAM.organizer}. All rights reserved.
           </p>
