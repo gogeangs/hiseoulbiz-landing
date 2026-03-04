@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { BONUS_TARGETS } from "./constants";
 
 export const SEOUL_DISTRICTS = [
   "강남구", "강동구", "강북구", "강서구", "관악구",
@@ -7,6 +8,8 @@ export const SEOUL_DISTRICTS = [
   "성동구", "성북구", "송파구", "양천구", "영등포구",
   "용산구", "은평구", "종로구", "중구", "중랑구",
 ] as const;
+
+const BONUS_TARGETS_ENUM = BONUS_TARGETS as unknown as readonly [string, ...string[]];
 
 export const applicationSchema = z.object({
   name: z
@@ -24,13 +27,14 @@ export const applicationSchema = z.object({
     .email("올바른 이메일 주소를 입력해 주세요."),
   birthDate: z
     .string()
-    .min(1, "생년월일을 입력해 주세요."),
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "올바른 생년월일을 입력해 주세요."),
   district: z
-    .string()
-    .min(1, "거주 지역을 선택해 주세요."),
+    .enum(SEOUL_DISTRICTS, { message: "거주 지역을 선택해 주세요." }),
   bonusTargets: z
-    .array(z.string())
+    .array(z.enum(BONUS_TARGETS_ENUM))
     .optional(),
+  privacyConsent: z
+    .literal(true, { message: "개인정보 수집·이용에 동의해 주세요." }),
 });
 
 export type ApplicationFormData = z.infer<typeof applicationSchema>;

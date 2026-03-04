@@ -1,11 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "crypto";
 import { signAdminToken } from "@/lib/auth";
+
+function safeCompare(a: string, b: string): boolean {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return timingSafeEqual(bufA, bufB);
+}
 
 export async function POST(request: NextRequest) {
   try {
     const { password } = await request.json();
+    const adminPassword = process.env.ADMIN_PASSWORD;
 
-    if (password !== process.env.ADMIN_PASSWORD) {
+    if (!adminPassword || typeof password !== "string" || !password) {
+      return NextResponse.json(
+        { error: "비밀번호가 올바르지 않습니다." },
+        { status: 401 }
+      );
+    }
+
+    if (!safeCompare(password, adminPassword)) {
       return NextResponse.json(
         { error: "비밀번호가 올바르지 않습니다." },
         { status: 401 }

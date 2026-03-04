@@ -16,16 +16,18 @@ export async function POST(request: NextRequest) {
     }
 
     const submittedAt = new Date().toISOString();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { privacyConsent: _consent, ...formData } = validated.data;
 
     // Dual write: DB + GAS (병렬 처리)
-    const dbPromise = insertApplication({ ...validated.data, submittedAt });
+    const dbPromise = insertApplication({ ...formData, submittedAt });
 
     const gasUrl = process.env.GAS_WEBHOOK_URL;
     const gasPromise = gasUrl
       ? fetch(gasUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...validated.data, submittedAt }),
+          body: JSON.stringify({ ...formData, submittedAt }),
         })
       : Promise.resolve(null);
 

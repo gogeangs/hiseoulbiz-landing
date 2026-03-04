@@ -17,19 +17,29 @@ export interface ApplicationRow {
 }
 
 export async function insertApplication(
-  data: ApplicationFormData & { submittedAt: string }
+  data: Omit<ApplicationFormData, "privacyConsent"> & { submittedAt: string }
 ) {
   const sql = getSQL();
   const { name, phone, email, birthDate, district, bonusTargets, submittedAt } =
     data;
+  // JSON으로 변환 후 Postgres에서 파싱 — SQL 인젝션 방지
   const targets =
     bonusTargets && bonusTargets.length > 0
-      ? `{${bonusTargets.map((t) => `"${t}"`).join(",")}}`
+      ? JSON.stringify(bonusTargets)
       : null;
   await sql`
     INSERT INTO applications (name, phone, email, birth_date, district, bonus_targets, submitted_at)
-    VALUES (${name}, ${phone}, ${email}, ${birthDate}, ${district}, ${targets}::text[], ${submittedAt})
+    VALUES (${name}, ${phone}, ${email}, ${birthDate}, ${district},
+      CASE WHEN ${targets}::text IS NOT NULL
+        THEN ARRAY(SELECT jsonb_array_elements_text(${targets}::jsonb))
+        ELSE NULL
+      END,
+      ${submittedAt})
   `;
+}
+
+function escapeILIKE(str: string): string {
+  return str.replace(/[%_\\]/g, "\\$&");
 }
 
 export async function getApplications(options?: {
@@ -40,7 +50,7 @@ export async function getApplications(options?: {
   const { search, district } = options ?? {};
 
   if (search && district) {
-    const pattern = `%${search}%`;
+    const pattern = `%${escapeILIKE(search)}%`;
     const rows = await sql`
       SELECT * FROM applications
       WHERE district = ${district}
@@ -51,7 +61,7 @@ export async function getApplications(options?: {
   }
 
   if (search) {
-    const pattern = `%${search}%`;
+    const pattern = `%${escapeILIKE(search)}%`;
     const rows = await sql`
       SELECT * FROM applications
       WHERE name ILIKE ${pattern} OR email ILIKE ${pattern} OR phone ILIKE ${pattern}
@@ -87,9 +97,9 @@ export async function getApplicationStats() {
   return {
     total: Number(totalResult[0].count),
     today: Number(todayResult[0].count),
-    byDistrict: districtResult as unknown as {
-      district: string;
-      count: number;
-    }[],
+    byDistrict: districtResult.map((r) => ({
+      district: String(r.district),
+      count: Number(r.count),
+    })),
   };
 }

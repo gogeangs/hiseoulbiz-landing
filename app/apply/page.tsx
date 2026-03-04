@@ -30,8 +30,9 @@ export default function ApplyPage() {
       phone: "",
       email: "",
       birthDate: "",
-      district: "",
+      district: undefined,
       bonusTargets: [],
+      privacyConsent: undefined as unknown as true,
     },
   });
 
@@ -239,18 +240,31 @@ export default function ApplyPage() {
 
           {/* 개인정보 동의 */}
           <section className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm md:p-8">
-            <p className="text-sm leading-relaxed text-gray-500">
-              신청 시 입력하신 개인정보(이름, 연락처, 이메일, 생년월일, 거주지역)는
-              교육생 선발 목적으로만 활용되며, 선발 완료 후 관련 법령에 따라
-              안전하게 관리됩니다.{" "}
-              <Link
-                href="/privacy"
-                target="_blank"
-                className="text-primary-700 underline underline-offset-2 hover:text-primary-800"
-              >
-                개인정보처리방침
-              </Link>
-            </p>
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                {...register("privacyConsent")}
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              />
+              <span className="text-sm leading-relaxed text-gray-600">
+                신청 시 입력하신 개인정보(이름, 연락처, 이메일, 생년월일,
+                거주지역)를 교육생 선발 목적으로 수집·이용하는 것에
+                동의합니다.{" "}
+                <Link
+                  href="/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary-700 underline underline-offset-2 hover:text-primary-800"
+                >
+                  개인정보처리방침
+                </Link>
+              </span>
+            </label>
+            {errors.privacyConsent && (
+              <p className="mt-2 text-sm text-red-500">
+                {errors.privacyConsent.message}
+              </p>
+            )}
           </section>
 
           {/* 에러 메시지 */}

@@ -41,6 +41,14 @@ export default function ApplicationTable({
     applyFilters(search, value);
   };
 
+  const escapeCSV = (value: string | number): string => {
+    let str = String(value);
+    if (/^[=+\-@\t\r]/.test(str)) {
+      str = `'${str}`;
+    }
+    return `"${str.replace(/"/g, '""')}"`;
+  };
+
   const handleExport = () => {
     const headers = [
       "번호",
@@ -66,7 +74,7 @@ export default function ApplicationTable({
     const bom = "\uFEFF";
     const csv =
       bom +
-      [headers, ...rows].map((row) => row.map((v) => `"${v}"`).join(",")).join("\n");
+      [headers, ...rows].map((row) => row.map(escapeCSV).join(",")).join("\n");
 
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);

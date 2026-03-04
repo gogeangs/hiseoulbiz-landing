@@ -1,7 +1,10 @@
 import { SignJWT, jwtVerify } from "jose";
 
-const getSecret = () =>
-  new TextEncoder().encode(process.env.ADMIN_JWT_SECRET);
+const getSecret = () => {
+  const secret = process.env.ADMIN_JWT_SECRET;
+  if (!secret) throw new Error("ADMIN_JWT_SECRET is not configured");
+  return new TextEncoder().encode(secret);
+};
 
 export async function signAdminToken(): Promise<string> {
   return new SignJWT({ role: "admin" })
