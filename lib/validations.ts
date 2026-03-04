@@ -29,8 +29,9 @@ export const applicationSchema = z.object({
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, "올바른 생년월일을 입력해 주세요.")
     .refine((val) => {
-      const d = new Date(val + "T00:00:00");
-      return !isNaN(d.getTime()) && d.toISOString().startsWith(val);
+      const [y, m, d] = val.split("-").map(Number);
+      const date = new Date(y, m - 1, d);
+      return date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d;
     }, "존재하지 않는 날짜입니다."),
   district: z
     .enum(SEOUL_DISTRICTS, { message: "거주 지역을 선택해 주세요." }),
