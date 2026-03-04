@@ -49,28 +49,28 @@ const items = [
 
 export default function ProgramOverview() {
   return (
-    <section id="overview" className="py-16 md:py-20">
+    <section id="overview" className="bg-white py-16 md:py-20">
       <div className="mx-auto max-w-6xl px-4">
         <h2 className="mb-4 text-center text-2xl font-bold text-primary-900 md:text-3xl">
           교육 개요
         </h2>
-        <p className="mb-12 text-center text-gray-600">
+        <p className="mb-12 text-center text-gray-500">
           글로벌 시장을 무대로 성장하고 싶은 청년을 위한 실전 중심 과정
         </p>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => (
             <div
               key={item.label}
-              className="flex items-start gap-4 rounded-xl border border-gray-100 bg-white p-5 shadow-sm"
+              className="flex items-start gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-6"
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary-50">
-                <item.icon className="h-5 w-5 text-primary-700" />
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-100">
+                <item.icon className="h-6 w-6 text-primary-700" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">{item.label}</p>
-                <p className="font-semibold text-primary-900">{item.value}</p>
-                <p className="text-sm text-gray-500">{item.sub}</p>
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-primary-600">{item.label}</p>
+                <p className="break-keep text-base font-bold text-primary-900">{item.value}</p>
+                <p className="mt-0.5 break-keep text-sm text-gray-500">{item.sub}</p>
               </div>
             </div>
           ))}

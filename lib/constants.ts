@@ -30,21 +30,21 @@ export const PROGRAM = {
 
 export const BENEFITS = [
   {
-    label: "교육비",
-    value: "0원",
-    description: "총 350시간 실무 중심 교육 전액 무료",
+    label: "실무 중심 교육",
+    value: "350시간",
+    description: "현직자 강사진의 실전 프로젝트 기반 커리큘럼",
     icon: "GraduationCap" as const,
   },
   {
-    label: "교육 수당",
+    label: "교육 수당 지급",
     value: "일 25,000원",
     description: "80% 이상 출석 시 지급 (최대 약 125만원)",
     icon: "Wallet" as const,
   },
   {
-    label: "인턴 급여",
-    value: "월 2,533,280원",
-    description: "우수 수료자 3개월 유급 인턴 (7월~10월)",
+    label: "유급 인턴 연계",
+    value: "3개월",
+    description: "우수 수료자 대상 월 253만원 유급 인턴십",
     icon: "Briefcase" as const,
   },
 ];

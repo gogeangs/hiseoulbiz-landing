@@ -46,36 +46,46 @@ export default function InternshipInfo() {
           </div>
         </div>
 
-        <h3 className="mb-6 text-center text-xl font-semibold">
-          취업 연계 지원
-        </h3>
-        <div className="mx-auto grid max-w-3xl gap-4 md:grid-cols-2">
-          <div className="flex items-start gap-3 rounded-xl bg-white/5 p-4">
-            <FileText className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
-            <div>
-              <p className="break-keep font-medium">이력서·자기소개서 1:1 첨삭</p>
-              <p className="break-keep text-sm text-white/60">전문가의 맞춤형 피드백</p>
+        <div className="mx-auto max-w-3xl rounded-2xl border border-accent/30 bg-accent/10 p-8 backdrop-blur-sm">
+          <h3 className="mb-6 text-center text-xl font-bold text-accent">
+            취업 연계 지원
+          </h3>
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="flex items-start gap-4 rounded-xl bg-white/10 p-5">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/20">
+                <FileText className="h-5 w-5 text-accent" />
+              </div>
+              <div>
+                <p className="break-keep font-semibold">이력서·자기소개서 1:1 첨삭</p>
+                <p className="mt-1 break-keep text-sm text-white/60">전문가의 맞춤형 피드백</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-start gap-3 rounded-xl bg-white/5 p-4">
-            <FolderOpen className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
-            <div>
-              <p className="break-keep font-medium">프로젝트 기반 포트폴리오 완성</p>
-              <p className="break-keep text-sm text-white/60">실무 역량을 증명하는 결과물</p>
+            <div className="flex items-start gap-4 rounded-xl bg-white/10 p-5">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/20">
+                <FolderOpen className="h-5 w-5 text-accent" />
+              </div>
+              <div>
+                <p className="break-keep font-semibold">프로젝트 기반 포트폴리오 완성</p>
+                <p className="mt-1 break-keep text-sm text-white/60">실무 역량을 증명하는 결과물</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-start gap-3 rounded-xl bg-white/5 p-4">
-            <HeadphonesIcon className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
-            <div>
-              <p className="break-keep font-medium">전담 퍼실리테이터 취업 상담</p>
-              <p className="break-keep text-sm text-white/60">교육 기간 내 지속적 지원</p>
+            <div className="flex items-start gap-4 rounded-xl bg-white/10 p-5">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/20">
+                <HeadphonesIcon className="h-5 w-5 text-accent" />
+              </div>
+              <div>
+                <p className="break-keep font-semibold">전담 퍼실리테이터 취업 상담</p>
+                <p className="mt-1 break-keep text-sm text-white/60">교육 기간 내 지속적 지원</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-start gap-3 rounded-xl bg-white/5 p-4">
-            <BadgeCheck className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
-            <div>
-              <p className="break-keep font-medium">유급 인턴 및 취업 연계</p>
-              <p className="break-keep text-sm text-white/60">수료 후 실무 경험 기회 제공</p>
+            <div className="flex items-start gap-4 rounded-xl bg-white/10 p-5">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/20">
+                <BadgeCheck className="h-5 w-5 text-accent" />
+              </div>
+              <div>
+                <p className="break-keep font-semibold">유급 인턴 및 취업 연계</p>
+                <p className="mt-1 break-keep text-sm text-white/60">수료 후 실무 경험 기회 제공</p>
+              </div>
             </div>
           </div>
         </div>
