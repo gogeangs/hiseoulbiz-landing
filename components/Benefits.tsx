@@ -135,18 +135,6 @@ export default function Benefits() {
           })}
         </div>
 
-        {/* 총 혜택 금액 */}
-        <div
-          className={`mt-10 text-center transition-all delay-500 duration-700 ${
-            visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-          }`}
-        >
-          <p className="mb-1 text-sm text-white/50">교육 + 인턴십 총 혜택</p>
-          <p className="text-4xl font-bold text-accent md:text-5xl">
-            약 <CountUpValue target={1000} prefix="" suffix="" start={visible} />만원
-            <span className="text-2xl text-white/70 md:text-3xl"> 이상</span>
-          </p>
-        </div>
       </div>
     </section>
   );
