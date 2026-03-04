@@ -14,9 +14,14 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const validated = applicationSchema
+    const adminSchema = applicationSchema
       .omit({ privacyConsent: true })
-      .safeParse(body);
+      .extend({
+        birthDate: applicationSchema.shape.birthDate.optional().default(""),
+        district: applicationSchema.shape.district.optional().default("" as never),
+      });
+
+    const validated = adminSchema.safeParse(body);
 
     if (!validated.success) {
       return NextResponse.json(
@@ -28,6 +33,8 @@ export async function POST(request: NextRequest) {
     const submittedAt = new Date().toISOString();
     await insertApplication({
       ...validated.data,
+      birthDate: validated.data.birthDate || "",
+      district: (validated.data.district || "") as typeof validated.data.district,
       submittedAt,
     });
 

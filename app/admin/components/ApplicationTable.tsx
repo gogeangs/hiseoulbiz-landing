@@ -43,8 +43,8 @@ export default function ApplicationTable({
   const [addForm, setAddForm] = useState(emptyForm);
 
   const handleAddSubmit = async () => {
-    if (!addForm.name || !addForm.phone || !addForm.email || !addForm.birthDate || !addForm.district) {
-      alert("필수 항목을 모두 입력해 주세요.");
+    if (!addForm.name || !addForm.phone || !addForm.email) {
+      alert("이름, 연락처, 이메일을 입력해 주세요.");
       return;
     }
     setIsAdding(true);
@@ -425,7 +425,7 @@ export default function ApplicationTable({
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">
-                  생년월일 <span className="text-red-500">*</span>
+                  생년월일
                 </label>
                 <input
                   type="date"
@@ -436,7 +436,7 @@ export default function ApplicationTable({
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">
-                  거주지역 <span className="text-red-500">*</span>
+                  거주지역
                 </label>
                 <select
                   value={addForm.district}
