@@ -33,12 +33,12 @@ export function buildApplicationGuideEmail(applicantName: string): string {
           </p>
           <p style="font-size:13px;color:#475569;line-height:1.7;margin:0;">
             본 과정은 서울시에서 주최하는 취업연계(매력일자리) 사업으로,
-            서울시 청년정책사업 참여 여부 확인을 위해
+            서울시 민관기업 참여형 매력일자리 사업 참여 여부 확인을 위해
             <strong>첨부된 참여신청서를 작성하여 제출</strong>해 주셔야 합니다.<br><br>
             또한 선발 면접 진행을 위해
-            <strong>자기소개서</strong>(양식 자유, A4 1장 내외)를
+            <strong>자기소개서</strong>를
             함께 제출해 주시기 바랍니다.<br><br>
-            첨부파일에는 <strong>참여신청서, 개인정보제공동의서, 자기소개서 양식</strong>이
+            첨부파일에는 <strong>참여신청서, 개인정보제공동의서, 자기소개 양식</strong>이
             포함되어 있습니다.
           </p>
         </div>
