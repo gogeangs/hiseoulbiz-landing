@@ -1,14 +1,5 @@
 import { CURRICULUM, PROGRAM } from "@/lib/constants";
 
-const barColors = [
-  "bg-primary-700",
-  "bg-primary-600",
-  "bg-primary-500",
-  "bg-primary-400",
-  "bg-primary-300",
-  "bg-primary-200",
-];
-
 export default function Curriculum() {
   return (
     <section id="curriculum" className="bg-gray-50 py-16 md:py-20">
@@ -20,32 +11,26 @@ export default function Curriculum() {
           총 {PROGRAM.totalHours}시간, 현직자 중심 실무 교육
         </p>
 
-        <div className="mx-auto max-w-3xl space-y-4">
+        {/* 가로 스크롤 카드 */}
+        <div className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-4 snap-x snap-mandatory md:mx-0 md:grid md:grid-cols-3 md:gap-5 md:overflow-visible md:px-0 md:pb-0">
           {CURRICULUM.map((item, idx) => (
             <div
               key={item.title}
-              className="flex items-center gap-5 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+              className="flex w-64 shrink-0 snap-start flex-col rounded-2xl border border-gray-100 bg-white p-6 shadow-sm md:w-auto"
             >
-              {/* 비중 표시 */}
-              <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl ${barColors[idx]} text-white`}>
-                <span className="text-lg font-bold">{item.percentage}%</span>
-              </div>
-
-              {/* 강의 정보 */}
-              <div className="min-w-0 flex-1">
-                <p className="break-keep text-lg font-bold text-primary-900">
-                  {item.title}
+              <span className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-primary-700 text-sm font-bold text-white">
+                {idx + 1}
+              </span>
+              <p className="mb-1 break-keep text-base font-bold text-primary-900">
+                {item.title}
+              </p>
+              {item.subtitle && (
+                <p className="mb-3 break-keep text-sm text-gray-400">
+                  {item.subtitle}
                 </p>
-                {item.subtitle && (
-                  <p className="mt-0.5 break-keep text-sm text-gray-500">
-                    {item.subtitle}
-                  </p>
-                )}
-              </div>
-
-              {/* 시간 */}
-              <span className="shrink-0 rounded-lg bg-primary-50 px-3 py-1.5 text-sm font-semibold text-primary-700">
-                {item.hours}H
+              )}
+              <span className="mt-auto text-sm font-medium text-primary-600">
+                {item.hours}시간
               </span>
             </div>
           ))}
