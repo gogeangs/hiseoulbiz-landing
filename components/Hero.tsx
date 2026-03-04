@@ -8,12 +8,11 @@ export default function Hero() {
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-primary-900 via-primary-800 to-primary-700 py-24 text-white md:py-36">
-      {/* 추상 그래픽 배경 */}
+      {/* 추상 그래픽 배경 — 플로팅 애니메이션 */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {/* 큰 원형 그라데이션 */}
-        <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-white/5" />
-        <div className="absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-white/5" />
-        <div className="absolute right-1/4 top-1/3 h-64 w-64 rounded-full bg-accent/10" />
+        <div className="absolute -right-32 -top-32 h-96 w-96 animate-[float_8s_ease-in-out_infinite] rounded-full bg-white/5" />
+        <div className="absolute -bottom-24 -left-24 h-80 w-80 animate-[float_10s_ease-in-out_infinite_1s] rounded-full bg-white/5" />
+        <div className="absolute right-1/4 top-1/3 h-64 w-64 animate-[float_7s_ease-in-out_infinite_0.5s] rounded-full bg-accent/10" />
         {/* 그리드 패턴 */}
         <div
           className="absolute inset-0 opacity-[0.04]"

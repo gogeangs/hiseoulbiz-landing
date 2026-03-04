@@ -1,13 +1,18 @@
+"use client";
+
 import { CURRICULUM, PROGRAM } from "@/lib/constants";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 export default function Curriculum() {
+  const { ref, visible } = useScrollReveal(0.1);
+
   return (
-    <section id="curriculum" className="bg-gray-50 py-16 md:py-20">
+    <section id="curriculum" className="bg-gray-50 py-16 md:py-20" ref={ref}>
       <div className="mx-auto max-w-6xl px-4">
-        <h2 className="mb-4 text-center text-2xl font-bold text-primary-900 md:text-3xl">
+        <h2 className={`mb-4 text-center text-2xl font-bold text-primary-900 md:text-3xl transition-all duration-700 ${visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
           커리큘럼
         </h2>
-        <p className="mb-12 text-center text-gray-500">
+        <p className={`mb-12 text-center text-gray-500 transition-all duration-700 delay-100 ${visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
           총 {PROGRAM.totalHours}시간, 현직자 중심 실무 교육
         </p>
 
@@ -16,7 +21,8 @@ export default function Curriculum() {
           {CURRICULUM.map((item, idx) => (
             <div
               key={item.title}
-              className="flex w-64 shrink-0 snap-start flex-col rounded-2xl border border-gray-100 bg-white p-6 shadow-sm md:w-auto"
+              className={`flex w-64 shrink-0 snap-start flex-col rounded-2xl border border-gray-100 bg-white p-6 shadow-sm md:w-auto transition-all duration-700 ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
+              style={{ transitionDelay: `${200 + idx * 100}ms` }}
             >
               <span className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-primary-700 text-sm font-bold text-white">
                 {idx + 1}

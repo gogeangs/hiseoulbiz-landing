@@ -2,26 +2,29 @@
 
 import { useState } from "react";
 import { ELIGIBILITY, BONUS_TARGETS } from "@/lib/constants";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { CheckCircle2, ChevronDown, Star } from "lucide-react";
 
 export default function Eligibility() {
   const [bonusOpen, setBonusOpen] = useState(false);
+  const { ref, visible } = useScrollReveal(0.1);
 
   return (
-    <section id="eligibility" className="py-16 md:py-20">
+    <section id="eligibility" className="py-16 md:py-20" ref={ref}>
       <div className="mx-auto max-w-6xl px-4">
-        <h2 className="mb-4 text-center text-2xl font-bold text-primary-900 md:text-3xl">
+        <h2 className={`mb-4 text-center text-2xl font-bold text-primary-900 md:text-3xl transition-all duration-700 ${visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
           지원 자격
         </h2>
-        <p className="mb-12 text-center text-gray-600">
+        <p className={`mb-12 text-center text-gray-600 transition-all duration-700 delay-100 ${visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
           아래 조건을 모두 충족하는 분이 지원 가능합니다
         </p>
 
         <div className="mx-auto max-w-2xl space-y-4">
-          {ELIGIBILITY.map((item) => (
+          {ELIGIBILITY.map((item, idx) => (
             <div
               key={item}
-              className="flex items-start gap-3 rounded-xl border border-gray-100 bg-white p-4 shadow-sm"
+              className={`flex items-start gap-3 rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-700 ${visible ? "translate-x-0 opacity-100" : "-translate-x-8 opacity-0"}`}
+              style={{ transitionDelay: `${200 + idx * 120}ms` }}
             >
               <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
               <p className="text-gray-700">{item}</p>

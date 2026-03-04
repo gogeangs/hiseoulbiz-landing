@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { PROGRAM } from "@/lib/constants";
 import { APPLY_URL, isApplicationOpen } from "@/lib/utils";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 import {
   BadgeCheck,
   FileText,
@@ -11,33 +14,34 @@ import {
 
 export default function InternshipInfo() {
   const open = isApplicationOpen();
+  const { ref, visible } = useScrollReveal(0.1);
 
   return (
-    <section id="internship" className="bg-primary-900 py-16 text-white md:py-20">
+    <section id="internship" className="bg-primary-900 py-16 text-white md:py-20" ref={ref}>
       <div className="mx-auto max-w-6xl px-4">
-        <h2 className="mb-4 text-center text-2xl font-bold md:text-3xl">
+        <h2 className={`mb-4 text-center text-2xl font-bold md:text-3xl transition-all duration-700 ${visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
           수료 후 바로 이어지는 유급 인턴십
         </h2>
-        <p className="mb-12 text-center text-white/70">
+        <p className={`mb-12 text-center text-white/70 transition-all duration-700 delay-100 ${visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
           80% 이상 출석한 우수 수료자 대상
         </p>
 
         <div className="mb-12 grid gap-6 md:grid-cols-3">
-          <div className="rounded-2xl bg-white/10 p-6 text-center backdrop-blur-sm">
+          <div className={`rounded-2xl bg-white/10 p-6 text-center backdrop-blur-sm transition-all duration-700 delay-200 ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
             <p className="mb-1 text-sm text-white/70">인턴 기간</p>
             <p className="whitespace-nowrap text-xl font-bold md:text-2xl">
               {PROGRAM.internStart} ~ {PROGRAM.internEnd}
             </p>
             <p className="mt-1 text-sm text-white/70">{PROGRAM.internMonths}개월</p>
           </div>
-          <div className="rounded-2xl bg-white/10 p-6 text-center backdrop-blur-sm">
+          <div className={`rounded-2xl bg-white/10 p-6 text-center backdrop-blur-sm transition-all duration-700 delay-300 ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
             <p className="mb-1 text-sm text-white/70">월 급여 (세전)</p>
             <p className="whitespace-nowrap text-xl font-bold md:text-2xl">
               {PROGRAM.internSalary}원
             </p>
             <p className="mt-1 text-sm text-white/70">× {PROGRAM.internMonths}개월</p>
           </div>
-          <div className="rounded-2xl bg-white/10 p-6 text-center backdrop-blur-sm">
+          <div className={`rounded-2xl bg-white/10 p-6 text-center backdrop-blur-sm transition-all duration-700 delay-[400ms] ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
             <p className="mb-1 text-sm text-white/70">추가 수당</p>
             <p className="break-keep text-xl font-bold md:text-2xl">
               연차휴가 미사용
@@ -46,7 +50,7 @@ export default function InternshipInfo() {
           </div>
         </div>
 
-        <div className="mx-auto max-w-3xl rounded-2xl border border-accent/30 bg-accent/10 p-8 backdrop-blur-sm">
+        <div className={`mx-auto max-w-3xl rounded-2xl border border-accent/30 bg-accent/10 p-8 backdrop-blur-sm transition-all duration-700 delay-500 ${visible ? "translate-y-0 opacity-100 scale-100" : "translate-y-8 opacity-0 scale-95"}`}>
           <h3 className="mb-6 text-center text-xl font-bold text-accent">
             취업 연계 지원
           </h3>

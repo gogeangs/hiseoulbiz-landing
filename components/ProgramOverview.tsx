@@ -1,4 +1,7 @@
+"use client";
+
 import { PROGRAM } from "@/lib/constants";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 import {
   CalendarDays,
   Clock,
@@ -48,21 +51,24 @@ const items = [
 ];
 
 export default function ProgramOverview() {
+  const { ref, visible } = useScrollReveal(0.1);
+
   return (
-    <section id="overview" className="bg-white py-16 md:py-20">
+    <section id="overview" className="bg-white py-16 md:py-20" ref={ref}>
       <div className="mx-auto max-w-6xl px-4">
-        <h2 className="mb-4 text-center text-2xl font-bold text-primary-900 md:text-3xl">
+        <h2 className={`mb-4 text-center text-2xl font-bold text-primary-900 md:text-3xl transition-all duration-700 ${visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
           교육 개요
         </h2>
-        <p className="mb-12 text-center text-gray-500">
+        <p className={`mb-12 text-center text-gray-500 transition-all duration-700 delay-100 ${visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
           글로벌 시장을 무대로 성장하고 싶은 청년을 위한 실전 중심 과정
         </p>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => (
+          {items.map((item, idx) => (
             <div
               key={item.label}
-              className="flex items-start gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-6"
+              className={`flex items-start gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-6 transition-all duration-700 ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
+              style={{ transitionDelay: `${200 + idx * 100}ms` }}
             >
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-100">
                 <item.icon className="h-6 w-6 text-primary-700" />
