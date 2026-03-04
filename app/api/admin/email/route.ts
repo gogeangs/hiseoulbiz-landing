@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { readFile } from "fs/promises";
+import path from "path";
 import { Resend } from "resend";
 import { verifyAdminToken } from "@/lib/auth";
 import { getApplicationsByIds, markEmailSent } from "@/lib/db";
@@ -37,6 +39,11 @@ export async function POST(request: NextRequest) {
     }
 
     const resend = getResend();
+
+    // 신청서 파일 읽기
+    const filePath = path.join(process.cwd(), "public/files/2026매력일자리_참여신청서.hwp");
+    const fileContent = await readFile(filePath);
+
     const results: { id: number; success: boolean; error?: string }[] = [];
 
     for (const app of applications) {
@@ -46,6 +53,12 @@ export async function POST(request: NextRequest) {
           to: app.email,
           subject: `[하이서울기업협회] ${app.name}님, 신청 접수 확인 및 신청서 안내`,
           html: buildApplicationGuideEmail(app.name),
+          attachments: [
+            {
+              filename: "2026매력일자리_참여신청서.hwp",
+              content: fileContent,
+            },
+          ],
         });
         results.push({ id: app.id, success: true });
       } catch (err) {
