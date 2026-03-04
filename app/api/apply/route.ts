@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { applicationSchema } from "@/lib/validations";
+import { insertApplication } from "@/lib/db";
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,27 +15,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const submittedAt = new Date().toISOString();
+
+    // Dual write: DB + GAS (병렬 처리)
+    const dbPromise = insertApplication({ ...validated.data, submittedAt });
+
     const gasUrl = process.env.GAS_WEBHOOK_URL;
-    if (!gasUrl) {
-      console.error("GAS_WEBHOOK_URL is not configured");
+    const gasPromise = gasUrl
+      ? fetch(gasUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...validated.data, submittedAt }),
+        })
+      : Promise.resolve(null);
+
+    const [dbResult, gasResult] = await Promise.allSettled([
+      dbPromise,
+      gasPromise,
+    ]);
+
+    // DB 저장 실패 시 에러 반환
+    if (dbResult.status === "rejected") {
+      console.error("DB insert failed:", dbResult.reason);
       return NextResponse.json(
-        { error: "서버 설정 오류입니다. 관리자에게 문의해 주세요." },
+        { error: "제출에 실패했습니다. 잠시 후 다시 시도해 주세요." },
         { status: 500 }
       );
     }
 
-    // Google Apps Script로 전달
-    const gasResponse = await fetch(gasUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...validated.data,
-        submittedAt: new Date().toISOString(),
-      }),
-    });
-
-    if (!gasResponse.ok) {
-      throw new Error("Google Apps Script 응답 오류");
+    // GAS 실패는 로그만 남김 (DB가 primary)
+    if (gasResult.status === "rejected") {
+      console.error("GAS webhook failed:", gasResult.reason);
     }
 
     return NextResponse.json({ success: true });
