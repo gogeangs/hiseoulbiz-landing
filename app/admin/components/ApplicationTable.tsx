@@ -2,8 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Search, Download, Loader2, Mail, Check, X } from "lucide-react";
+import { Search, Download, Loader2, Mail, Check, X, Plus } from "lucide-react";
 import { SEOUL_DISTRICTS } from "@/lib/validations";
+import { BONUS_TARGETS } from "@/lib/constants";
 import type { ApplicationRow } from "@/lib/db";
 
 interface ApplicationTableProps {
@@ -24,10 +25,60 @@ export default function ApplicationTable({
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [isSending, setIsSending] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
   const [sendResult, setSendResult] = useState<{
     sent: number;
     failed: number;
   } | null>(null);
+
+  const emptyForm = {
+    name: "",
+    phone: "",
+    email: "",
+    birthDate: "",
+    district: "",
+    bonusTargets: [] as string[],
+  };
+  const [addForm, setAddForm] = useState(emptyForm);
+
+  const handleAddSubmit = async () => {
+    if (!addForm.name || !addForm.phone || !addForm.email || !addForm.birthDate || !addForm.district) {
+      alert("필수 항목을 모두 입력해 주세요.");
+      return;
+    }
+    setIsAdding(true);
+    try {
+      const res = await fetch("/api/admin/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(addForm),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "등록에 실패했습니다.");
+        return;
+      }
+      setShowAddModal(false);
+      setAddForm(emptyForm);
+      startTransition(() => {
+        router.refresh();
+      });
+    } catch {
+      alert("등록 중 오류가 발생했습니다.");
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  const toggleBonusTarget = (target: string) => {
+    setAddForm((prev) => ({
+      ...prev,
+      bonusTargets: prev.bonusTargets.includes(target)
+        ? prev.bonusTargets.filter((t) => t !== target)
+        : [...prev.bonusTargets, target],
+    }));
+  };
 
   const applyFilters = (newSearch: string, newDistrict: string) => {
     const params = new URLSearchParams();
@@ -207,6 +258,13 @@ export default function ApplicationTable({
             이메일 발송{selectedIds.size > 0 && ` (${selectedIds.size})`}
           </button>
           <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+          >
+            <Plus className="h-4 w-4" />
+            추가
+          </button>
+          <button
             onClick={handleExport}
             disabled={applications.length === 0}
             className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
@@ -322,7 +380,117 @@ export default function ApplicationTable({
         </table>
       </div>
 
-      {/* 확인 모달 */}
+      {/* 신청자 추가 모달 */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="mx-4 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-bold text-gray-900">신청자 추가</h3>
+            <div className="mt-4 space-y-4">
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  이름 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={addForm.name}
+                  onChange={(e) => setAddForm((p) => ({ ...p, name: e.target.value }))}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+                  placeholder="홍길동"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  연락처 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={addForm.phone}
+                  onChange={(e) => setAddForm((p) => ({ ...p, phone: e.target.value }))}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+                  placeholder="010-1234-5678"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  이메일 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={addForm.email}
+                  onChange={(e) => setAddForm((p) => ({ ...p, email: e.target.value }))}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+                  placeholder="example@email.com"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  생년월일 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={addForm.birthDate}
+                  onChange={(e) => setAddForm((p) => ({ ...p, birthDate: e.target.value }))}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  거주지역 <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={addForm.district}
+                  onChange={(e) => setAddForm((p) => ({ ...p, district: e.target.value }))}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+                >
+                  <option value="">선택해 주세요</option>
+                  {SEOUL_DISTRICTS.map((d) => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  가점대상 (선택)
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {BONUS_TARGETS.map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => toggleBonusTarget(t)}
+                      className={`rounded-full px-3 py-1 text-xs transition-colors ${
+                        addForm.bonusTargets.includes(t)
+                          ? "bg-primary-600 text-white"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => { setShowAddModal(false); setAddForm(emptyForm); }}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleAddSubmit}
+                disabled={isAdding}
+                className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2 text-sm text-white hover:bg-primary-700 disabled:opacity-50"
+              >
+                {isAdding && <Loader2 className="h-4 w-4 animate-spin" />}
+                등록
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 이메일 발송 확인 모달 */}
       {showConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="mx-4 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
