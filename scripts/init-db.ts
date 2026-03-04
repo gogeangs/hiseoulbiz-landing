@@ -23,6 +23,9 @@ async function initDb() {
     ADD COLUMN IF NOT EXISTS email_sent_at TIMESTAMPTZ DEFAULT NULL
   `;
 
+  // 이메일 유니크 제약 (중복 신청 방지)
+  await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_applications_email_unique ON applications(email)`;
+
   await sql`CREATE INDEX IF NOT EXISTS idx_applications_submitted_at ON applications(submitted_at DESC)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_applications_district ON applications(district)`;
 

@@ -1,6 +1,13 @@
 import { neon } from "@neondatabase/serverless";
 import type { ApplicationFormData } from "./validations";
 
+export class DuplicateEmailError extends Error {
+  constructor() {
+    super("이미 동일한 이메일로 신청한 내역이 있습니다.");
+    this.name = "DuplicateEmailError";
+  }
+}
+
 function getSQL() {
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error("DATABASE_URL is not configured");
@@ -30,15 +37,23 @@ export async function insertApplication(
     bonusTargets && bonusTargets.length > 0
       ? JSON.stringify(bonusTargets)
       : null;
-  await sql`
-    INSERT INTO applications (name, phone, email, birth_date, district, bonus_targets, submitted_at)
-    VALUES (${name}, ${phone}, ${email}, ${birthDate}, ${district},
-      CASE WHEN ${targets}::text IS NOT NULL
-        THEN ARRAY(SELECT jsonb_array_elements_text(${targets}::jsonb))
-        ELSE NULL
-      END,
-      ${submittedAt})
-  `;
+  try {
+    await sql`
+      INSERT INTO applications (name, phone, email, birth_date, district, bonus_targets, submitted_at)
+      VALUES (${name}, ${phone}, ${email}, ${birthDate}, ${district},
+        CASE WHEN ${targets}::text IS NOT NULL
+          THEN ARRAY(SELECT jsonb_array_elements_text(${targets}::jsonb))
+          ELSE NULL
+        END,
+        ${submittedAt})
+    `;
+  } catch (error: unknown) {
+    // UNIQUE 제약 위반 (이메일 중복)
+    if (error instanceof Error && error.message.includes("idx_applications_email_unique")) {
+      throw new DuplicateEmailError();
+    }
+    throw error;
+  }
 }
 
 function escapeILIKE(str: string): string {
@@ -117,13 +132,13 @@ export async function checkDuplicateEmail(email: string): Promise<boolean> {
 export async function updateApplication(
   id: number,
   data: { name: string; phone: string; email: string; birthDate?: string; district?: string; bonusTargets?: string[] }
-): Promise<void> {
+): Promise<boolean> {
   const sql = getSQL();
   const targets =
     data.bonusTargets && data.bonusTargets.length > 0
       ? JSON.stringify(data.bonusTargets)
       : null;
-  await sql`
+  const rows = await sql`
     UPDATE applications
     SET name = ${data.name},
         phone = ${data.phone},
@@ -135,12 +150,15 @@ export async function updateApplication(
           ELSE NULL
         END
     WHERE id = ${id}
+    RETURNING id
   `;
+  return rows.length > 0;
 }
 
-export async function deleteApplication(id: number): Promise<void> {
+export async function deleteApplication(id: number): Promise<boolean> {
   const sql = getSQL();
-  await sql`DELETE FROM applications WHERE id = ${id}`;
+  const rows = await sql`DELETE FROM applications WHERE id = ${id} RETURNING id`;
+  return rows.length > 0;
 }
 
 export async function getApplicationStats() {

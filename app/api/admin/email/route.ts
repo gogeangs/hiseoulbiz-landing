@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       const batchResults = await Promise.allSettled(
         batch.map(async (app) => {
           await resend.emails.send({
-            from: "하이서울기업협회 <onboarding@resend.dev>",
+            from: process.env.RESEND_FROM_EMAIL || "하이서울기업협회 <onboarding@resend.dev>",
             to: app.email,
             subject: `[하이서울기업협회] ${app.name}님, 신청 접수 확인 및 신청서 안내`,
             html: buildApplicationGuideEmail(app.name),

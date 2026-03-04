@@ -46,7 +46,7 @@ export async function PUT(
       );
     }
 
-    await updateApplication(id, {
+    const updated = await updateApplication(id, {
       name: validated.data.name,
       phone: validated.data.phone,
       email: validated.data.email,
@@ -54,6 +54,13 @@ export async function PUT(
       district: (validated.data.district || "") as string,
       bonusTargets: validated.data.bonusTargets,
     });
+
+    if (!updated) {
+      return NextResponse.json(
+        { error: "해당 신청자를 찾을 수 없습니다." },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -87,7 +94,13 @@ export async function DELETE(
   }
 
   try {
-    await deleteApplication(id);
+    const deleted = await deleteApplication(id);
+    if (!deleted) {
+      return NextResponse.json(
+        { error: "해당 신청자를 찾을 수 없습니다." },
+        { status: 404 }
+      );
+    }
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Application delete error:", error);

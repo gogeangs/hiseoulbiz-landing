@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminToken } from "@/lib/auth";
-import { insertApplication } from "@/lib/db";
+import { insertApplication, checkDuplicateEmail } from "@/lib/db";
 import { applicationSchema } from "@/lib/validations";
 
 export async function POST(request: NextRequest) {
@@ -27,6 +27,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "입력 정보를 확인해 주세요.", details: validated.error.flatten() },
         { status: 400 }
+      );
+    }
+
+    // 중복 이메일 체크
+    const isDuplicate = await checkDuplicateEmail(validated.data.email);
+    if (isDuplicate) {
+      return NextResponse.json(
+        { error: "이미 동일한 이메일로 신청한 내역이 있습니다." },
+        { status: 409 }
       );
     }
 
