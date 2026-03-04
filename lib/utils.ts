@@ -11,3 +11,5 @@ export function isApplicationOpen(): boolean {
 }
 
 export const UCANSIGN_URL = process.env.NEXT_PUBLIC_UCANSIGN_URL || "#";
+
+export const APPLY_URL = "/apply";

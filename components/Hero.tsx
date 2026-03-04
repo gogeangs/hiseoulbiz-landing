@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { PROGRAM } from "@/lib/constants";
-import { UCANSIGN_URL, isApplicationOpen } from "@/lib/utils";
+import { APPLY_URL, isApplicationOpen } from "@/lib/utils";
 import { ArrowRight, Users, CalendarClock } from "lucide-react";
 
 export default function Hero() {
@@ -108,15 +109,13 @@ export default function Hero() {
         </div>
 
         {open ? (
-          <a
-            href={UCANSIGN_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href={APPLY_URL}
             className="inline-flex items-center gap-2 rounded-xl bg-white px-10 py-5 text-xl font-bold text-primary-800 shadow-lg transition-all hover:bg-primary-50 hover:shadow-xl"
           >
             지금 신청하기
             <ArrowRight className="h-6 w-6" />
-          </a>
+          </Link>
         ) : (
           <span className="inline-flex items-center gap-2 rounded-xl bg-gray-300 px-10 py-5 text-xl font-bold text-gray-500">
             모집이 마감되었습니다

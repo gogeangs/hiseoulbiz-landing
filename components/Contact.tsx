@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { PROGRAM } from "@/lib/constants";
-import { UCANSIGN_URL, isApplicationOpen } from "@/lib/utils";
+import Link from "next/link";
+import { APPLY_URL, isApplicationOpen } from "@/lib/utils";
 import { Phone, Mail, ArrowRight } from "lucide-react";
 
 export default function Contact() {
@@ -33,15 +34,13 @@ export default function Contact() {
         </p>
 
         {open && (
-          <a
-            href={UCANSIGN_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href={APPLY_URL}
             className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-8 py-4 text-lg font-bold transition-colors hover:bg-primary-500"
           >
             지금 신청하기
             <ArrowRight className="h-5 w-5" />
-          </a>
+          </Link>
         )}
 
         <div className="mt-12 border-t border-white/10 pt-8">

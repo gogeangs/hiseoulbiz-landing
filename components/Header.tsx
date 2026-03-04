@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { UCANSIGN_URL, isApplicationOpen } from "@/lib/utils";
+import Link from "next/link";
+import { APPLY_URL, isApplicationOpen } from "@/lib/utils";
 import { PROGRAM } from "@/lib/constants";
 
 export default function Header() {
@@ -26,14 +27,12 @@ export default function Header() {
           {PROGRAM.title}
         </span>
         {open ? (
-          <a
-            href={UCANSIGN_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href={APPLY_URL}
             className="shrink-0 rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-800"
           >
             신청하기
-          </a>
+          </Link>
         ) : (
           <span className="shrink-0 rounded-lg bg-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-500">
             모집 마감

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { UCANSIGN_URL, isApplicationOpen } from "@/lib/utils";
+import Link from "next/link";
+import { APPLY_URL, isApplicationOpen } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
 
 export default function FloatingCTA() {
@@ -23,15 +24,13 @@ export default function FloatingCTA() {
         visible ? "translate-y-0" : "translate-y-full"
       }`}
     >
-      <a
-        href={UCANSIGN_URL}
-        target="_blank"
-        rel="noopener noreferrer"
+      <Link
+        href={APPLY_URL}
         className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary-700 py-4 text-lg font-bold text-white shadow-2xl transition-colors hover:bg-primary-800"
       >
         신청하기
         <ArrowRight className="h-5 w-5" />
-      </a>
+      </Link>
     </div>
   );
 }
