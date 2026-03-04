@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { PROGRAM } from "@/lib/constants";
 import { APPLY_URL, isApplicationOpen } from "@/lib/utils";
@@ -17,8 +18,16 @@ export default function InternshipInfo() {
   const { ref, visible } = useScrollReveal(0.1);
 
   return (
-    <section id="internship" className="bg-primary-900 py-16 text-white md:py-20" ref={ref}>
-      <div className="mx-auto max-w-6xl px-4">
+    <section id="internship" className="relative overflow-hidden bg-primary-900 py-16 text-white md:py-20" ref={ref}>
+      <Image
+        src="/images/internship-bg.jpg"
+        alt=""
+        fill
+        className="object-cover opacity-15"
+        sizes="100vw"
+      />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary-900/60 via-primary-900/40 to-primary-900/80" />
+      <div className="relative mx-auto max-w-6xl px-4">
         <h2 className={`mb-4 text-center text-2xl font-bold md:text-3xl transition-all duration-700 ${visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
           수료 후 바로 이어지는 유급 인턴십
         </h2>

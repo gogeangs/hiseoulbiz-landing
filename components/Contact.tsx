@@ -4,14 +4,38 @@ import Image from "next/image";
 import { PROGRAM } from "@/lib/constants";
 import Link from "next/link";
 import { APPLY_URL, isApplicationOpen } from "@/lib/utils";
-import { Phone, Mail, ArrowRight } from "lucide-react";
+import { Phone, Mail, ArrowRight, MapPin } from "lucide-react";
 
 export default function Contact() {
   const open = isApplicationOpen();
 
   return (
     <footer id="contact" className="bg-primary-950 pb-24 pt-16 text-white md:pb-16">
-      <div className="mx-auto max-w-6xl px-4 text-center">
+      <div className="mx-auto max-w-6xl px-4">
+        {/* 교육 장소 */}
+        <div className="mb-12 overflow-hidden rounded-2xl">
+          <div className="relative h-48 md:h-56">
+            <Image
+              src="/images/venue.jpg"
+              alt="SBA 글로벌마케팅센터"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 1152px"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-primary-950 via-primary-950/60 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-6">
+              <div className="flex items-center gap-2 text-white/80">
+                <MapPin className="h-5 w-5 shrink-0 text-accent" />
+                <div>
+                  <p className="font-semibold">{PROGRAM.location}</p>
+                  <p className="text-sm text-white/60">{PROGRAM.locationDetail}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="text-center">
         <h2 className="mb-8 text-2xl font-bold md:text-3xl">문의하기</h2>
 
         <div className="mb-8 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-8">
@@ -66,6 +90,7 @@ export default function Contact() {
           <p className="text-sm text-white/50">
             &copy; 2026 {PROGRAM.organizer}. All rights reserved.
           </p>
+        </div>
         </div>
       </div>
     </footer>

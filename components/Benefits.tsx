@@ -29,14 +29,20 @@ export default function Benefits() {
             return (
               <div
                 key={benefit.label}
-                className={`rounded-2xl border border-primary-100 bg-white p-8 text-center shadow-sm transition-all duration-700 hover:shadow-lg hover:border-primary-200 ${
+                className={`relative overflow-hidden rounded-2xl border border-primary-100 bg-white p-8 text-center shadow-sm transition-all duration-700 hover:shadow-lg hover:border-primary-200 ${
                   visible
                     ? "translate-y-0 opacity-100"
                     : "translate-y-8 opacity-0"
                 }`}
                 style={{ transitionDelay: `${200 + idx * 100}ms` }}
               >
-                <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-50">
+                {/* 상단 그라데이션 라인 */}
+                <div className="absolute left-0 right-0 top-0 h-1 bg-gradient-to-r from-primary-600 via-primary-400 to-accent" />
+                {/* 배경 장식 아이콘 */}
+                <div className="pointer-events-none absolute -right-4 -top-4 opacity-[0.04]">
+                  <Icon className="h-32 w-32 text-primary-900" aria-hidden="true" />
+                </div>
+                <div className="relative mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-50">
                   <Icon className="h-8 w-8 text-primary-700" aria-hidden="true" />
                 </div>
                 <p className="mb-2 text-sm font-medium text-primary-600">

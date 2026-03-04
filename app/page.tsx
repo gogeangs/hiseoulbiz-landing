@@ -8,6 +8,7 @@ import Curriculum from "@/components/Curriculum";
 import Eligibility from "@/components/Eligibility";
 import Timeline from "@/components/Timeline";
 import FAQ from "@/components/FAQ";
+import PointBanner from "@/components/PointBanner";
 import Contact from "@/components/Contact";
 import FloatingCTA from "@/components/FloatingCTA";
 
@@ -19,6 +20,7 @@ export default function Home() {
       <main>
         <Hero />
         <Benefits />
+        <PointBanner />
         <InternshipInfo />
         <ProgramOverview />
         <Curriculum />
