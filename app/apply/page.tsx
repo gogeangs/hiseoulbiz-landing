@@ -8,7 +8,7 @@ import {
   SEOUL_DISTRICTS,
   type ApplicationFormData,
 } from "@/lib/validations";
-import { PROGRAM } from "@/lib/constants";
+import { PROGRAM, BONUS_TARGETS } from "@/lib/constants";
 import { isApplicationOpen } from "@/lib/utils";
 import Link from "next/link";
 import { ArrowLeft, Loader2, AlertCircle } from "lucide-react";
@@ -21,7 +21,6 @@ export default function ApplyPage() {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm<ApplicationFormData>({
     resolver: zodResolver(applicationSchema),
@@ -31,15 +30,9 @@ export default function ApplyPage() {
       email: "",
       birthDate: "",
       district: "",
-      motivation: "",
-      experience: "",
-      goals: "",
+      bonusTargets: [],
     },
   });
-
-  const motivationLength = watch("motivation")?.length || 0;
-  const experienceLength = watch("experience")?.length || 0;
-  const goalsLength = watch("goals")?.length || 0;
 
   const onSubmit = async (data: ApplicationFormData) => {
     setSubmitting(true);
@@ -215,95 +208,30 @@ export default function ApplyPage() {
             </div>
           </section>
 
-          {/* 지원 동기 */}
+          {/* 가점 확인 */}
           <section className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm md:p-8">
-            <h2 className="mb-6 text-lg font-semibold text-primary-900">
-              지원 내용
+            <h2 className="mb-2 text-lg font-semibold text-primary-900">
+              가점 대상 확인
             </h2>
+            <p className="mb-6 text-sm text-gray-500">
+              해당되는 항목이 있으면 체크해 주세요. (선택사항)
+            </p>
 
-            <div className="space-y-5">
-              {/* 지원동기 */}
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                  지원동기 <span className="text-red-500">*</span>
+            <div className="space-y-3">
+              {BONUS_TARGETS.map((target) => (
+                <label
+                  key={target}
+                  className="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 px-4 py-3 transition-colors hover:border-primary-300 hover:bg-primary-50 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50"
+                >
+                  <input
+                    type="checkbox"
+                    value={target}
+                    {...register("bonusTargets")}
+                    className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  />
+                  <span className="text-sm text-gray-700">{target}</span>
                 </label>
-                <textarea
-                  {...register("motivation")}
-                  rows={5}
-                  placeholder="본 과정에 지원하게 된 동기를 작성해 주세요. (50자 이상)"
-                  className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
-                />
-                <div className="mt-1 flex items-center justify-between">
-                  {errors.motivation ? (
-                    <p className="text-sm text-red-500">
-                      {errors.motivation.message}
-                    </p>
-                  ) : (
-                    <span />
-                  )}
-                  <span
-                    className={`text-xs ${
-                      motivationLength < 50 ? "text-gray-400" : "text-green-500"
-                    }`}
-                  >
-                    {motivationLength}/1000
-                  </span>
-                </div>
-              </div>
-
-              {/* 관련 경험 */}
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                  관련 경험 <span className="text-gray-400">(선택)</span>
-                </label>
-                <textarea
-                  {...register("experience")}
-                  rows={4}
-                  placeholder="이커머스, 마케팅, 세일즈 등 관련 경험이 있다면 작성해 주세요."
-                  className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
-                />
-                <div className="mt-1 flex items-center justify-between">
-                  {errors.experience ? (
-                    <p className="text-sm text-red-500">
-                      {errors.experience.message}
-                    </p>
-                  ) : (
-                    <span />
-                  )}
-                  <span className="text-xs text-gray-400">
-                    {experienceLength}/1000
-                  </span>
-                </div>
-              </div>
-
-              {/* 희망 진로 */}
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                  희망 진로 <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  {...register("goals")}
-                  rows={4}
-                  placeholder="교육 수료 후 희망하는 진로나 목표를 작성해 주세요. (30자 이상)"
-                  className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
-                />
-                <div className="mt-1 flex items-center justify-between">
-                  {errors.goals ? (
-                    <p className="text-sm text-red-500">
-                      {errors.goals.message}
-                    </p>
-                  ) : (
-                    <span />
-                  )}
-                  <span
-                    className={`text-xs ${
-                      goalsLength < 30 ? "text-gray-400" : "text-green-500"
-                    }`}
-                  >
-                    {goalsLength}/1000
-                  </span>
-                </div>
-              </div>
+              ))}
             </div>
           </section>
 

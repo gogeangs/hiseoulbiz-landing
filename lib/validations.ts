@@ -28,19 +28,9 @@ export const applicationSchema = z.object({
   district: z
     .string()
     .min(1, "거주 지역을 선택해 주세요."),
-  motivation: z
-    .string()
-    .min(50, "지원동기를 50자 이상 입력해 주세요.")
-    .max(1000, "지원동기는 1000자 이내로 입력해 주세요."),
-  experience: z
-    .string()
-    .max(1000, "관련 경험은 1000자 이내로 입력해 주세요.")
-    .optional()
-    .or(z.literal("")),
-  goals: z
-    .string()
-    .min(30, "희망 진로를 30자 이상 입력해 주세요.")
-    .max(1000, "희망 진로는 1000자 이내로 입력해 주세요."),
+  bonusTargets: z
+    .array(z.string())
+    .optional(),
 });
 
 export type ApplicationFormData = z.infer<typeof applicationSchema>;
