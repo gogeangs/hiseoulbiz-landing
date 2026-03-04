@@ -16,15 +16,16 @@ export default function ApplySuccessPage() {
         <p className="mb-8 text-gray-500">
           입력하신 정보가 정상적으로 접수되었습니다.
           <br />
-          선발 결과는 {PROGRAM.resultDate}에 개별 통보됩니다.
+          서울시청 제출용 신청서를 <strong className="text-gray-700">24시간 내에 이메일로</strong> 발송해 드리겠습니다.
         </p>
 
         <div className="mb-8 space-y-3 rounded-xl bg-gray-50 p-5 text-left">
           <h3 className="text-sm font-semibold text-gray-700">앞으로의 일정</h3>
           <div className="space-y-2 text-sm text-gray-600">
-            <p>1. 선발 면접: {PROGRAM.interviewDate}</p>
-            <p>2. 결과 발표: {PROGRAM.resultDate} (이메일/문자)</p>
-            <p>3. 교육 시작: {PROGRAM.startDate}</p>
+            <p>1. 신청서 이메일 발송 (24시간 내)</p>
+            <p>2. 선발 면접: {PROGRAM.interviewDate}</p>
+            <p>3. 결과 발표: {PROGRAM.resultDate} (이메일/문자)</p>
+            <p>4. 교육 시작: {PROGRAM.startDate}</p>
           </div>
         </div>
 
