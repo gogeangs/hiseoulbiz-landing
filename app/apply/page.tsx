@@ -12,6 +12,7 @@ import { PROGRAM, BONUS_TARGETS } from "@/lib/constants";
 import { isApplicationOpen } from "@/lib/utils";
 import Link from "next/link";
 import { ArrowLeft, Loader2, AlertCircle } from "lucide-react";
+import { trackLead } from "@/lib/fbq";
 
 export default function ApplyPage() {
   const open = isApplicationOpen();
@@ -50,6 +51,7 @@ export default function ApplyPage() {
         throw new Error(body.error || "제출에 실패했습니다.");
       }
 
+      trackLead();
       window.location.href = "/apply/success";
     } catch (err) {
       setSubmitError(

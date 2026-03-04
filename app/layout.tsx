@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
+import MetaPixel from "@/components/MetaPixel";
 import "./globals.css";
 
 const notoSansKR = Noto_Sans_KR({
@@ -9,7 +10,10 @@ const notoSansKR = Noto_Sans_KR({
   variable: "--font-noto-sans-kr",
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://hiseoulbiz-landing.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "2026 글로벌 이커머스 & 세일즈 기획 실무 과정 | 교육생 모집",
   description:
     "무료 교육, 일 25,000원 수당, 월 253만원 인턴십. 서울 거주 만 18~39세 청년 대상. 3월 31일 마감. (사)하이서울기업협회",
@@ -17,6 +21,7 @@ export const metadata: Metadata = {
     title: "2026 글로벌 이커머스 & 세일즈 기획 실무 과정",
     description:
       "교육비 0원 | 일 25,000원 수당 | 월 253만원 인턴십 | 모집 마감 3/31",
+    siteName: "(사)하이서울기업협회",
     locale: "ko_KR",
     type: "website",
   },
@@ -33,7 +38,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className={notoSansKR.variable}>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <MetaPixel />
+        {children}
+      </body>
     </html>
   );
 }
