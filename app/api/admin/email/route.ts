@@ -53,28 +53,41 @@ export async function POST(request: NextRequest) {
 
     const results: { id: number; success: boolean; error?: string }[] = [];
 
-    for (const app of applications) {
-      try {
-        await resend.emails.send({
-          from: "하이서울기업협회 <onboarding@resend.dev>",
-          to: app.email,
-          subject: `[하이서울기업협회] ${app.name}님, 신청 접수 확인 및 신청서 안내`,
-          html: buildApplicationGuideEmail(app.name),
-          attachments: [
-            {
-              filename: "2026매력일자리_참여신청서.hwp",
-              content: fileContent,
-            },
-          ],
-        });
-        results.push({ id: app.id, success: true });
-      } catch (err) {
-        console.error(`Email failed for ID ${app.id}:`, err);
-        results.push({
-          id: app.id,
-          success: false,
-          error: err instanceof Error ? err.message : "발송 실패",
-        });
+    // 5건씩 병렬 발송 (Vercel 타임아웃 방지)
+    const BATCH_SIZE = 5;
+    for (let i = 0; i < applications.length; i += BATCH_SIZE) {
+      const batch = applications.slice(i, i + BATCH_SIZE);
+      const batchResults = await Promise.allSettled(
+        batch.map(async (app) => {
+          await resend.emails.send({
+            from: "하이서울기업협회 <onboarding@resend.dev>",
+            to: app.email,
+            subject: `[하이서울기업협회] ${app.name}님, 신청 접수 확인 및 신청서 안내`,
+            html: buildApplicationGuideEmail(app.name),
+            attachments: [
+              {
+                filename: "2026매력일자리_참여신청서.hwp",
+                content: fileContent,
+              },
+            ],
+          });
+          return app.id;
+        })
+      );
+
+      for (let j = 0; j < batchResults.length; j++) {
+        const r = batchResults[j];
+        const app = batch[j];
+        if (r.status === "fulfilled") {
+          results.push({ id: app.id, success: true });
+        } else {
+          console.error(`Email failed for ID ${app.id}:`, r.reason);
+          results.push({
+            id: app.id,
+            success: false,
+            error: r.reason instanceof Error ? r.reason.message : "발송 실패",
+          });
+        }
       }
     }
 

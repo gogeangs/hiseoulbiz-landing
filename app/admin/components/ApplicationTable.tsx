@@ -54,9 +54,9 @@ export default function ApplicationTable({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(addForm),
       });
-      const data = await res.json();
       if (!res.ok) {
-        alert(data.error || "등록에 실패했습니다.");
+        const data = await res.json().catch(() => null);
+        alert(data?.error || "등록에 실패했습니다.");
         return;
       }
       setShowAddModal(false);
@@ -128,13 +128,14 @@ export default function ApplicationTable({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ applicationIds: Array.from(selectedIds) }),
       });
-      const data = await res.json();
 
       if (!res.ok) {
-        alert(data.error || "발송에 실패했습니다.");
+        const data = await res.json().catch(() => null);
+        alert(data?.error || "발송에 실패했습니다.");
         return;
       }
 
+      const data = await res.json();
       setSendResult({ sent: data.sent, failed: data.failed });
       setSelectedIds(new Set());
       startTransition(() => {

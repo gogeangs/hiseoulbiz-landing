@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHmac } from "crypto";
 import { signAdminToken } from "@/lib/auth";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 function safeCompare(a: string, b: string): boolean {
   const key = "compare";
@@ -11,6 +12,15 @@ function safeCompare(a: string, b: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: IP당 1분에 5회
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    if (!checkRateLimit(ip, { maxRequests: 5, windowMs: 60_000 })) {
+      return NextResponse.json(
+        { error: "로그인 시도가 너무 많습니다. 잠시 후 다시 시도해 주세요." },
+        { status: 429 }
+      );
+    }
+
     const { password } = await request.json();
     const adminPassword = process.env.ADMIN_PASSWORD;
 

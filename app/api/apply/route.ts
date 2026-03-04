@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { applicationSchema } from "@/lib/validations";
-import { insertApplication } from "@/lib/db";
+import { insertApplication, checkDuplicateEmail } from "@/lib/db";
 import { DEADLINE_ISO } from "@/lib/constants";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: IP당 1분에 5회
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    if (!checkRateLimit(ip, { maxRequests: 5, windowMs: 60_000 })) {
+      return NextResponse.json(
+        { error: "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요." },
+        { status: 429 }
+      );
+    }
+
     // 마감일 서버 사이드 체크
     if (new Date() > new Date(DEADLINE_ISO)) {
       return NextResponse.json(
@@ -21,6 +31,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "입력 정보를 확인해 주세요.", details: validated.error.flatten() },
         { status: 400 }
+      );
+    }
+
+    // 중복 신청 체크 (이메일 기준)
+    const isDuplicate = await checkDuplicateEmail(validated.data.email);
+    if (isDuplicate) {
+      return NextResponse.json(
+        { error: "이미 동일한 이메일로 신청한 내역이 있습니다." },
+        { status: 409 }
       );
     }
 

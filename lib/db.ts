@@ -106,6 +106,14 @@ export async function markEmailSent(ids: number[]): Promise<void> {
   `;
 }
 
+export async function checkDuplicateEmail(email: string): Promise<boolean> {
+  const sql = getSQL();
+  const rows = await sql`
+    SELECT 1 FROM applications WHERE email = ${email} LIMIT 1
+  `;
+  return rows.length > 0;
+}
+
 export async function getApplicationStats() {
   const sql = getSQL();
   const [totalResult, districtResult, todayResult] = await Promise.all([

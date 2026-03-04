@@ -27,7 +27,11 @@ export const applicationSchema = z.object({
     .email("올바른 이메일 주소를 입력해 주세요."),
   birthDate: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "올바른 생년월일을 입력해 주세요."),
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "올바른 생년월일을 입력해 주세요.")
+    .refine((val) => {
+      const d = new Date(val + "T00:00:00");
+      return !isNaN(d.getTime()) && d.toISOString().startsWith(val);
+    }, "존재하지 않는 날짜입니다."),
   district: z
     .enum(SEOUL_DISTRICTS, { message: "거주 지역을 선택해 주세요." }),
   bonusTargets: z

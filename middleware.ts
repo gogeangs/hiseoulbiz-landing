@@ -28,7 +28,11 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    const secret = new TextEncoder().encode(process.env.ADMIN_JWT_SECRET);
+    const jwtSecret = process.env.ADMIN_JWT_SECRET;
+    if (!jwtSecret) {
+      return unauthorizedResponse(isApi, request);
+    }
+    const secret = new TextEncoder().encode(jwtSecret);
     await jwtVerify(token, secret);
     return NextResponse.next();
   } catch {
