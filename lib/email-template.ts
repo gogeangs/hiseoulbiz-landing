@@ -37,7 +37,9 @@ export function buildApplicationGuideEmail(applicantName: string): string {
             <strong>첨부된 참여신청서를 작성하여 제출</strong>해 주셔야 합니다.<br><br>
             또한 선발 면접 진행을 위해
             <strong>자기소개서</strong>(양식 자유, A4 1장 내외)를
-            함께 제출해 주시기 바랍니다.
+            함께 제출해 주시기 바랍니다.<br><br>
+            첨부파일에는 <strong>참여신청서, 개인정보제공동의서, 자기소개서 양식</strong>이
+            포함되어 있습니다.
           </p>
         </div>
 
@@ -46,7 +48,7 @@ export function buildApplicationGuideEmail(applicantName: string): string {
             중요 안내
           </p>
           <p style="font-size:13px;color:#78350f;line-height:1.7;margin:0;">
-            첨부파일(참여신청서 + 자기소개서) 제출까지 완료하셔야
+            첨부파일(참여신청서 + 개인정보제공동의서 + 자기소개서) 제출까지 완료하셔야
             <strong>최종 접수가 완료</strong>되며,
             이후 <strong>면접일정 안내</strong>를 받으실 수 있습니다.<br>
             회신처: <strong>${PROGRAM.contact.email}</strong>
