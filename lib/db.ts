@@ -114,6 +114,35 @@ export async function checkDuplicateEmail(email: string): Promise<boolean> {
   return rows.length > 0;
 }
 
+export async function updateApplication(
+  id: number,
+  data: { name: string; phone: string; email: string; birthDate?: string; district?: string; bonusTargets?: string[] }
+): Promise<void> {
+  const sql = getSQL();
+  const targets =
+    data.bonusTargets && data.bonusTargets.length > 0
+      ? JSON.stringify(data.bonusTargets)
+      : null;
+  await sql`
+    UPDATE applications
+    SET name = ${data.name},
+        phone = ${data.phone},
+        email = ${data.email},
+        birth_date = ${data.birthDate || ""},
+        district = ${data.district || ""},
+        bonus_targets = CASE WHEN ${targets}::text IS NOT NULL
+          THEN ARRAY(SELECT jsonb_array_elements_text(${targets}::jsonb))
+          ELSE NULL
+        END
+    WHERE id = ${id}
+  `;
+}
+
+export async function deleteApplication(id: number): Promise<void> {
+  const sql = getSQL();
+  await sql`DELETE FROM applications WHERE id = ${id}`;
+}
+
 export async function getApplicationStats() {
   const sql = getSQL();
   const [totalResult, districtResult, todayResult] = await Promise.all([

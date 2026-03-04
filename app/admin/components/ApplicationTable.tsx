@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Search, Download, Loader2, Mail, Check, X, Plus } from "lucide-react";
+import { Search, Download, Loader2, Mail, Check, X, Plus, Pencil, Trash2 } from "lucide-react";
 import { SEOUL_DISTRICTS } from "@/lib/validations";
 import { BONUS_TARGETS } from "@/lib/constants";
 import type { ApplicationRow } from "@/lib/db";
@@ -12,6 +12,24 @@ interface ApplicationTableProps {
   initialSearch?: string;
   initialDistrict?: string;
 }
+
+type FormData = {
+  name: string;
+  phone: string;
+  email: string;
+  birthDate: string;
+  district: string;
+  bonusTargets: string[];
+};
+
+const emptyForm: FormData = {
+  name: "",
+  phone: "",
+  email: "",
+  birthDate: "",
+  district: "",
+  bonusTargets: [],
+};
 
 export default function ApplicationTable({
   applications,
@@ -32,15 +50,19 @@ export default function ApplicationTable({
     failed: number;
   } | null>(null);
 
-  const emptyForm = {
-    name: "",
-    phone: "",
-    email: "",
-    birthDate: "",
-    district: "",
-    bonusTargets: [] as string[],
-  };
-  const [addForm, setAddForm] = useState(emptyForm);
+  // 추가 폼
+  const [addForm, setAddForm] = useState<FormData>(emptyForm);
+
+  // 수정 폼
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editForm, setEditForm] = useState<FormData>(emptyForm);
+  const [isEditing, setIsEditing] = useState(false);
+
+  // 삭제 확인
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleAddSubmit = async () => {
     if (!addForm.name || !addForm.phone || !addForm.email) {
@@ -71,8 +93,87 @@ export default function ApplicationTable({
     }
   };
 
-  const toggleBonusTarget = (target: string) => {
-    setAddForm((prev) => ({
+  const openEditModal = (app: ApplicationRow) => {
+    setEditingId(app.id);
+    setEditForm({
+      name: app.name,
+      phone: app.phone,
+      email: app.email,
+      birthDate: app.birth_date || "",
+      district: app.district || "",
+      bonusTargets: app.bonus_targets ?? [],
+    });
+    setShowEditModal(true);
+  };
+
+  const handleEditSubmit = async () => {
+    if (!editForm.name || !editForm.phone || !editForm.email) {
+      alert("이름, 연락처, 이메일을 입력해 주세요.");
+      return;
+    }
+    setIsEditing(true);
+    try {
+      const res = await fetch(`/api/admin/applications/${editingId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editForm),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        alert(data?.error || "수정에 실패했습니다.");
+        return;
+      }
+      setShowEditModal(false);
+      setEditingId(null);
+      setEditForm(emptyForm);
+      startTransition(() => {
+        router.refresh();
+      });
+    } catch {
+      alert("수정 중 오류가 발생했습니다.");
+    } finally {
+      setIsEditing(false);
+    }
+  };
+
+  const openDeleteConfirm = (id: number) => {
+    setDeletingId(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/applications/${deletingId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        alert(data?.error || "삭제에 실패했습니다.");
+        return;
+      }
+      setShowDeleteConfirm(false);
+      setDeletingId(null);
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        if (deletingId) next.delete(deletingId);
+        return next;
+      });
+      startTransition(() => {
+        router.refresh();
+      });
+    } catch {
+      alert("삭제 중 오류가 발생했습니다.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const toggleFormBonusTarget = (
+    setter: React.Dispatch<React.SetStateAction<FormData>>,
+    target: string
+  ) => {
+    setter((prev) => ({
       ...prev,
       bonusTargets: prev.bonusTargets.includes(target)
         ? prev.bonusTargets.filter((t) => t !== target)
@@ -196,6 +297,102 @@ export default function ApplicationTable({
     URL.revokeObjectURL(url);
   };
 
+  // 이메일 발송 확인 모달용: 이미 발송된 건수
+  const alreadySentCount = applications.filter(
+    (a) => selectedIds.has(a.id) && a.email_sent_at
+  ).length;
+
+  const renderFormFields = (
+    form: FormData,
+    setter: React.Dispatch<React.SetStateAction<FormData>>
+  ) => (
+    <div className="mt-4 space-y-4">
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          이름 <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          value={form.name}
+          onChange={(e) => setter((p) => ({ ...p, name: e.target.value }))}
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+          placeholder="홍길동"
+        />
+      </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          연락처 <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          value={form.phone}
+          onChange={(e) => setter((p) => ({ ...p, phone: e.target.value }))}
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+          placeholder="010-1234-5678"
+        />
+      </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          이메일 <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="email"
+          value={form.email}
+          onChange={(e) => setter((p) => ({ ...p, email: e.target.value }))}
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+          placeholder="example@email.com"
+        />
+      </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          생년월일
+        </label>
+        <input
+          type="date"
+          value={form.birthDate}
+          onChange={(e) => setter((p) => ({ ...p, birthDate: e.target.value }))}
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+        />
+      </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          거주지역
+        </label>
+        <select
+          value={form.district}
+          onChange={(e) => setter((p) => ({ ...p, district: e.target.value }))}
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+        >
+          <option value="">선택해 주세요</option>
+          {SEOUL_DISTRICTS.map((d) => (
+            <option key={d} value={d}>{d}</option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          가점대상 (선택)
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {BONUS_TARGETS.map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => toggleFormBonusTarget(setter, t)}
+              className={`rounded-full px-3 py-1 text-xs transition-colors ${
+                form.bonusTargets.includes(t)
+                  ? "bg-primary-600 text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
       {/* 발송 결과 배너 */}
@@ -279,7 +476,7 @@ export default function ApplicationTable({
 
       {/* 테이블 */}
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[900px] text-sm">
+        <table className="w-full min-w-[1000px] text-sm">
           <thead>
             <tr className="border-b bg-gray-50 text-left">
               <th className="px-4 py-3">
@@ -302,13 +499,14 @@ export default function ApplicationTable({
               <th className="px-4 py-3 font-medium text-gray-500">가점대상</th>
               <th className="px-4 py-3 font-medium text-gray-500">신청일시</th>
               <th className="px-4 py-3 font-medium text-gray-500">발송</th>
+              <th className="px-4 py-3 font-medium text-gray-500">관리</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {applications.length === 0 ? (
               <tr>
                 <td
-                  colSpan={10}
+                  colSpan={11}
                   className="px-4 py-12 text-center text-gray-400"
                 >
                   {search || district
@@ -375,6 +573,24 @@ export default function ApplicationTable({
                       <span className="text-xs text-gray-300">미발송</span>
                     )}
                   </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => openEditModal(app)}
+                        className="rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                        title="수정"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => openDeleteConfirm(app.id)}
+                        className="rounded p-1 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                        title="삭제"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))
             )}
@@ -387,91 +603,7 @@ export default function ApplicationTable({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="mx-4 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
             <h3 className="text-lg font-bold text-gray-900">신청자 추가</h3>
-            <div className="mt-4 space-y-4">
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  이름 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={addForm.name}
-                  onChange={(e) => setAddForm((p) => ({ ...p, name: e.target.value }))}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
-                  placeholder="홍길동"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  연락처 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={addForm.phone}
-                  onChange={(e) => setAddForm((p) => ({ ...p, phone: e.target.value }))}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
-                  placeholder="010-1234-5678"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  이메일 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  value={addForm.email}
-                  onChange={(e) => setAddForm((p) => ({ ...p, email: e.target.value }))}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
-                  placeholder="example@email.com"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  생년월일
-                </label>
-                <input
-                  type="date"
-                  value={addForm.birthDate}
-                  onChange={(e) => setAddForm((p) => ({ ...p, birthDate: e.target.value }))}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  거주지역
-                </label>
-                <select
-                  value={addForm.district}
-                  onChange={(e) => setAddForm((p) => ({ ...p, district: e.target.value }))}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
-                >
-                  <option value="">선택해 주세요</option>
-                  {SEOUL_DISTRICTS.map((d) => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  가점대상 (선택)
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {BONUS_TARGETS.map((t) => (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => toggleBonusTarget(t)}
-                      className={`rounded-full px-3 py-1 text-xs transition-colors ${
-                        addForm.bonusTargets.includes(t)
-                          ? "bg-primary-600 text-white"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                      }`}
-                    >
-                      {t}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+            {renderFormFields(addForm, setAddForm)}
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => { setShowAddModal(false); setAddForm(emptyForm); }}
@@ -492,6 +624,60 @@ export default function ApplicationTable({
         </div>
       )}
 
+      {/* 신청자 수정 모달 */}
+      {showEditModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="mx-4 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-bold text-gray-900">신청자 수정</h3>
+            {renderFormFields(editForm, setEditForm)}
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => { setShowEditModal(false); setEditingId(null); setEditForm(emptyForm); }}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleEditSubmit}
+                disabled={isEditing}
+                className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2 text-sm text-white hover:bg-primary-700 disabled:opacity-50"
+              >
+                {isEditing && <Loader2 className="h-4 w-4 animate-spin" />}
+                저장
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 삭제 확인 모달 */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="mx-4 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-bold text-gray-900">신청자 삭제</h3>
+            <p className="mt-2 text-sm text-gray-600">
+              해당 신청자를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => { setShowDeleteConfirm(false); setDeletingId(null); }}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="flex items-center gap-1.5 rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700 disabled:opacity-50"
+              >
+                {isDeleting && <Loader2 className="h-4 w-4 animate-spin" />}
+                삭제
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 이메일 발송 확인 모달 */}
       {showConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -503,6 +689,11 @@ export default function ApplicationTable({
               선택한 <strong>{selectedIds.size}명</strong>에게 서울시청 제출용
               신청서 안내 이메일을 발송합니다.
             </p>
+            {alreadySentCount > 0 && (
+              <p className="mt-1 text-sm text-amber-600">
+                이미 발송된 {alreadySentCount}건이 포함되어 있습니다. (재발송)
+              </p>
+            )}
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setShowConfirmModal(false)}
