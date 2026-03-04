@@ -1,0 +1,77 @@
+import { NextRequest, NextResponse } from "next/server";
+import { Resend } from "resend";
+import { verifyAdminToken } from "@/lib/auth";
+import { getApplicationsByIds, markEmailSent } from "@/lib/db";
+import { buildApplicationGuideEmail } from "@/lib/email-template";
+
+function getResend() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) throw new Error("RESEND_API_KEY is not configured");
+  return new Resend(apiKey);
+}
+
+export async function POST(request: NextRequest) {
+  const token = request.cookies.get("admin_token")?.value;
+  if (!token || !(await verifyAdminToken(token))) {
+    return NextResponse.json(
+      { error: "인증이 필요합니다." },
+      { status: 401 }
+    );
+  }
+
+  try {
+    const { applicationIds } = await request.json();
+    if (!Array.isArray(applicationIds) || applicationIds.length === 0) {
+      return NextResponse.json(
+        { error: "발송 대상을 선택해 주세요." },
+        { status: 400 }
+      );
+    }
+
+    const applications = await getApplicationsByIds(applicationIds);
+    if (applications.length === 0) {
+      return NextResponse.json(
+        { error: "유효한 신청 데이터가 없습니다." },
+        { status: 404 }
+      );
+    }
+
+    const resend = getResend();
+    const results: { id: number; success: boolean; error?: string }[] = [];
+
+    for (const app of applications) {
+      try {
+        await resend.emails.send({
+          from: "하이서울기업협회 <onboarding@resend.dev>",
+          to: app.email,
+          subject: `[하이서울기업협회] ${app.name}님, 신청 접수 확인 및 신청서 안내`,
+          html: buildApplicationGuideEmail(app.name),
+        });
+        results.push({ id: app.id, success: true });
+      } catch (err) {
+        console.error(`Email failed for ID ${app.id}:`, err);
+        results.push({
+          id: app.id,
+          success: false,
+          error: err instanceof Error ? err.message : "발송 실패",
+        });
+      }
+    }
+
+    const sentIds = results.filter((r) => r.success).map((r) => r.id);
+    if (sentIds.length > 0) {
+      await markEmailSent(sentIds);
+    }
+
+    return NextResponse.json({
+      sent: sentIds.length,
+      failed: results.filter((r) => !r.success).length,
+    });
+  } catch (error) {
+    console.error("Email send error:", error);
+    return NextResponse.json(
+      { error: "이메일 발송 중 오류가 발생했습니다." },
+      { status: 500 }
+    );
+  }
+}

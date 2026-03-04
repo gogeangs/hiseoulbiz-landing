@@ -12,8 +12,15 @@ async function initDb() {
       birth_date    VARCHAR(20) NOT NULL,
       district      VARCHAR(10) NOT NULL,
       bonus_targets TEXT[],
-      submitted_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      submitted_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      email_sent_at TIMESTAMPTZ DEFAULT NULL
     )
+  `;
+
+  // 기존 테이블에 컬럼 추가 (이미 있으면 무시)
+  await sql`
+    ALTER TABLE applications
+    ADD COLUMN IF NOT EXISTS email_sent_at TIMESTAMPTZ DEFAULT NULL
   `;
 
   await sql`CREATE INDEX IF NOT EXISTS idx_applications_submitted_at ON applications(submitted_at DESC)`;

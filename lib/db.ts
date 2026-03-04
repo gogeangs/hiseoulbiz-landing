@@ -14,6 +14,7 @@ export interface ApplicationRow {
   district: string;
   bonus_targets: string[] | null;
   submitted_at: string;
+  email_sent_at: string | null;
 }
 
 export async function insertApplication(
@@ -84,6 +85,23 @@ export async function getApplications(options?: {
     ORDER BY submitted_at DESC
   `;
   return rows as ApplicationRow[];
+}
+
+export async function getApplicationsByIds(
+  ids: number[]
+): Promise<ApplicationRow[]> {
+  const sql = getSQL();
+  const rows = await sql`
+    SELECT * FROM applications WHERE id = ANY(${ids})
+  `;
+  return rows as ApplicationRow[];
+}
+
+export async function markEmailSent(ids: number[]): Promise<void> {
+  const sql = getSQL();
+  await sql`
+    UPDATE applications SET email_sent_at = NOW() WHERE id = ANY(${ids})
+  `;
 }
 
 export async function getApplicationStats() {

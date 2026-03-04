@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Search, Download, Loader2 } from "lucide-react";
+import { Search, Download, Loader2, Mail, Check, X } from "lucide-react";
 import { SEOUL_DISTRICTS } from "@/lib/validations";
 import type { ApplicationRow } from "@/lib/db";
 
@@ -21,6 +21,13 @@ export default function ApplicationTable({
   const [isPending, startTransition] = useTransition();
   const [search, setSearch] = useState(initialSearch ?? "");
   const [district, setDistrict] = useState(initialDistrict ?? "");
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [isSending, setIsSending] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [sendResult, setSendResult] = useState<{
+    sent: number;
+    failed: number;
+  } | null>(null);
 
   const applyFilters = (newSearch: string, newDistrict: string) => {
     const params = new URLSearchParams();
@@ -41,6 +48,53 @@ export default function ApplicationTable({
     applyFilters(search, value);
   };
 
+  const toggleSelect = (id: number) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === applications.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(applications.map((a) => a.id)));
+    }
+  };
+
+  const handleSendEmail = async () => {
+    setShowConfirmModal(false);
+    setIsSending(true);
+    setSendResult(null);
+
+    try {
+      const res = await fetch("/api/admin/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ applicationIds: Array.from(selectedIds) }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "발송에 실패했습니다.");
+        return;
+      }
+
+      setSendResult({ sent: data.sent, failed: data.failed });
+      setSelectedIds(new Set());
+      startTransition(() => {
+        router.refresh();
+      });
+    } catch {
+      alert("이메일 발송 중 오류가 발생했습니다.");
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   const escapeCSV = (value: string | number): string => {
     let str = String(value);
     if (/^[=+\-@\t\r]/.test(str)) {
@@ -59,6 +113,7 @@ export default function ApplicationTable({
       "거주지역",
       "가점대상",
       "신청일시",
+      "이메일발송",
     ];
     const rows = applications.map((app, idx) => [
       idx + 1,
@@ -69,6 +124,9 @@ export default function ApplicationTable({
       app.district,
       app.bonus_targets?.join(", ") ?? "",
       new Date(app.submitted_at).toLocaleString("ko-KR"),
+      app.email_sent_at
+        ? new Date(app.email_sent_at).toLocaleString("ko-KR")
+        : "미발송",
     ]);
 
     const bom = "\uFEFF";
@@ -87,6 +145,22 @@ export default function ApplicationTable({
 
   return (
     <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
+      {/* 발송 결과 배너 */}
+      {sendResult && (
+        <div className="flex items-center justify-between border-b bg-green-50 px-4 py-3">
+          <p className="text-sm text-green-800">
+            이메일 발송 완료: 성공 {sendResult.sent}건
+            {sendResult.failed > 0 && `, 실패 ${sendResult.failed}건`}
+          </p>
+          <button
+            onClick={() => setSendResult(null)}
+            className="text-green-600 hover:text-green-800"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
       {/* 필터 바 */}
       <div className="flex flex-col gap-3 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 gap-3">
@@ -121,6 +195,18 @@ export default function ApplicationTable({
             총 {applications.length}건
           </span>
           <button
+            onClick={() => setShowConfirmModal(true)}
+            disabled={selectedIds.size === 0 || isSending}
+            className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-3 py-2 text-sm text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isSending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Mail className="h-4 w-4" />
+            )}
+            이메일 발송{selectedIds.size > 0 && ` (${selectedIds.size})`}
+          </button>
+          <button
             onClick={handleExport}
             disabled={applications.length === 0}
             className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
@@ -133,9 +219,20 @@ export default function ApplicationTable({
 
       {/* 테이블 */}
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[800px] text-sm">
+        <table className="w-full min-w-[900px] text-sm">
           <thead>
             <tr className="border-b bg-gray-50 text-left">
+              <th className="px-4 py-3">
+                <input
+                  type="checkbox"
+                  checked={
+                    applications.length > 0 &&
+                    selectedIds.size === applications.length
+                  }
+                  onChange={toggleSelectAll}
+                  className="h-4 w-4 rounded border-gray-300"
+                />
+              </th>
               <th className="px-4 py-3 font-medium text-gray-500">#</th>
               <th className="px-4 py-3 font-medium text-gray-500">이름</th>
               <th className="px-4 py-3 font-medium text-gray-500">연락처</th>
@@ -144,13 +241,14 @@ export default function ApplicationTable({
               <th className="px-4 py-3 font-medium text-gray-500">지역</th>
               <th className="px-4 py-3 font-medium text-gray-500">가점대상</th>
               <th className="px-4 py-3 font-medium text-gray-500">신청일시</th>
+              <th className="px-4 py-3 font-medium text-gray-500">발송</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {applications.length === 0 ? (
               <tr>
                 <td
-                  colSpan={8}
+                  colSpan={10}
                   className="px-4 py-12 text-center text-gray-400"
                 >
                   {search || district
@@ -164,6 +262,14 @@ export default function ApplicationTable({
                   key={app.id}
                   className="transition-colors hover:bg-gray-50"
                 >
+                  <td className="px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(app.id)}
+                      onChange={() => toggleSelect(app.id)}
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                  </td>
                   <td className="px-4 py-3 text-gray-400">{idx + 1}</td>
                   <td className="px-4 py-3 font-medium text-gray-900">
                     {app.name}
@@ -199,12 +305,51 @@ export default function ApplicationTable({
                       minute: "2-digit",
                     })}
                   </td>
+                  <td className="px-4 py-3 text-center">
+                    {app.email_sent_at ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs text-green-700">
+                        <Check className="h-3 w-3" />
+                        발송완료
+                      </span>
+                    ) : (
+                      <span className="text-xs text-gray-300">미발송</span>
+                    )}
+                  </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
       </div>
+
+      {/* 확인 모달 */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="mx-4 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-bold text-gray-900">
+              이메일 발송 확인
+            </h3>
+            <p className="mt-2 text-sm text-gray-600">
+              선택한 <strong>{selectedIds.size}명</strong>에게 서울시청 제출용
+              신청서 안내 이메일을 발송합니다.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setShowConfirmModal(false)}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleSendEmail}
+                className="rounded-lg bg-primary-600 px-4 py-2 text-sm text-white hover:bg-primary-700"
+              >
+                발송하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
