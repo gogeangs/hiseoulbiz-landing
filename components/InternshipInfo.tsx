@@ -25,19 +25,23 @@ export default function InternshipInfo() {
         <div className="mb-12 grid gap-6 md:grid-cols-3">
           <div className="rounded-2xl bg-white/10 p-6 text-center backdrop-blur-sm">
             <p className="mb-1 text-sm text-white/70">인턴 기간</p>
-            <p className="text-2xl font-bold">
+            <p className="whitespace-nowrap text-xl font-bold md:text-2xl">
               {PROGRAM.internStart} ~ {PROGRAM.internEnd}
             </p>
             <p className="mt-1 text-sm text-white/70">{PROGRAM.internMonths}개월</p>
           </div>
           <div className="rounded-2xl bg-white/10 p-6 text-center backdrop-blur-sm">
             <p className="mb-1 text-sm text-white/70">월 급여 (세전)</p>
-            <p className="text-2xl font-bold">{PROGRAM.internSalary}원</p>
+            <p className="whitespace-nowrap text-xl font-bold md:text-2xl">
+              {PROGRAM.internSalary}원
+            </p>
             <p className="mt-1 text-sm text-white/70">× {PROGRAM.internMonths}개월</p>
           </div>
           <div className="rounded-2xl bg-white/10 p-6 text-center backdrop-blur-sm">
             <p className="mb-1 text-sm text-white/70">추가 수당</p>
-            <p className="text-2xl font-bold">연차휴가 미사용</p>
+            <p className="break-keep text-xl font-bold md:text-2xl">
+              연차휴가 미사용
+            </p>
             <p className="mt-1 text-sm text-white/70">수당 별도 지급</p>
           </div>
         </div>
@@ -49,29 +53,29 @@ export default function InternshipInfo() {
           <div className="flex items-start gap-3 rounded-xl bg-white/5 p-4">
             <FileText className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
             <div>
-              <p className="font-medium">이력서·자기소개서 1:1 첨삭</p>
-              <p className="text-sm text-white/60">전문가의 맞춤형 피드백</p>
+              <p className="break-keep font-medium">이력서·자기소개서 1:1 첨삭</p>
+              <p className="break-keep text-sm text-white/60">전문가의 맞춤형 피드백</p>
             </div>
           </div>
           <div className="flex items-start gap-3 rounded-xl bg-white/5 p-4">
             <FolderOpen className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
             <div>
-              <p className="font-medium">프로젝트 기반 포트폴리오 완성</p>
-              <p className="text-sm text-white/60">실무 역량을 증명하는 결과물</p>
+              <p className="break-keep font-medium">프로젝트 기반 포트폴리오 완성</p>
+              <p className="break-keep text-sm text-white/60">실무 역량을 증명하는 결과물</p>
             </div>
           </div>
           <div className="flex items-start gap-3 rounded-xl bg-white/5 p-4">
             <HeadphonesIcon className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
             <div>
-              <p className="font-medium">전담 퍼실리테이터 취업 상담</p>
-              <p className="text-sm text-white/60">교육 기간 내 지속적 지원</p>
+              <p className="break-keep font-medium">전담 퍼실리테이터 취업 상담</p>
+              <p className="break-keep text-sm text-white/60">교육 기간 내 지속적 지원</p>
             </div>
           </div>
           <div className="flex items-start gap-3 rounded-xl bg-white/5 p-4">
             <BadgeCheck className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
             <div>
-              <p className="font-medium">유급 인턴 및 취업 연계</p>
-              <p className="text-sm text-white/60">수료 후 실무 경험 기회 제공</p>
+              <p className="break-keep font-medium">유급 인턴 및 취업 연계</p>
+              <p className="break-keep text-sm text-white/60">수료 후 실무 경험 기회 제공</p>
             </div>
           </div>
         </div>

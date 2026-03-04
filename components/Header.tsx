@@ -23,7 +23,7 @@ export default function Header() {
       }`}
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <span className="text-sm font-bold text-primary-900 md:text-base">
+        <span className="text-base font-bold text-primary-900 md:text-lg">
           {PROGRAM.title}
         </span>
         {open ? (
