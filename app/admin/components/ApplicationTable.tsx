@@ -513,7 +513,7 @@ export default function ApplicationTable({
 
       {/* 테이블 */}
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[1000px] text-sm">
+        <table className="w-full min-w-[1200px] text-sm [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap">
           <thead>
             <tr className="border-b bg-gray-50 text-left">
               <th className="px-4 py-3">
@@ -576,7 +576,7 @@ export default function ApplicationTable({
                     {app.birth_date}
                   </td>
                   <td className="px-4 py-3 text-gray-600">{app.district}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 !whitespace-normal">
                     {app.bonus_targets && app.bonus_targets.length > 0 ? (
                       <div className="flex flex-wrap gap-1">
                         {app.bonus_targets.map((t) => (
