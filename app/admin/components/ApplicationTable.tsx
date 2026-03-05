@@ -421,8 +421,22 @@ export default function ApplicationTable({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="이름, 연락처, 이메일 검색"
-              className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-4 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+              className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-9 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
             />
+            {(search || district) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearch("");
+                  setDistrict("");
+                  applyFilters("", "");
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                title="검색 초기화"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </form>
           <select
             value={district}
