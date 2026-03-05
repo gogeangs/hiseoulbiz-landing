@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Search, Download, Loader2, Mail, Check, X, Plus, Pencil, Trash2, CircleCheck, Circle } from "lucide-react";
+import { Search, Download, Loader2, Mail, Check, X, Plus, Pencil, Trash2, CircleCheck, Circle, ChevronLeft, ChevronRight } from "lucide-react";
 import { SEOUL_DISTRICTS } from "@/lib/validations";
 import { BONUS_TARGETS } from "@/lib/constants";
 import type { ApplicationRow } from "@/lib/db";
@@ -68,6 +68,10 @@ export default function ApplicationTable({
 
   const [togglingId, setTogglingId] = useState<number | null>(null);
 
+  // 페이지네이션
+  const PAGE_SIZE = 20;
+  const [currentPage, setCurrentPage] = useState(1);
+
   // 클라이언트 사이드 필터링
   const filtered = applications.filter((app) => {
     if (sentFilter === "sent" && !app.email_sent_at) return false;
@@ -77,6 +81,10 @@ export default function ApplicationTable({
     if (completedFilter === "uncompleted" && app.completed_at) return false;
     return true;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paged = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   const hasActiveFilter = !!(search || district || sentFilter || completedFilter);
 
@@ -220,6 +228,7 @@ export default function ApplicationTable({
 
   const applyFilters = (newSearch: string, newDistrict: string) => {
     setSelectedIds(new Set());
+    setCurrentPage(1);
     const params = new URLSearchParams();
     if (newSearch) params.set("search", newSearch);
     if (newDistrict) params.set("district", newDistrict);
@@ -248,10 +257,16 @@ export default function ApplicationTable({
   };
 
   const toggleSelectAll = () => {
-    if (selectedIds.size === filtered.length) {
-      setSelectedIds(new Set());
+    const pageIds = paged.map((a) => a.id);
+    const allSelected = pageIds.every((id) => selectedIds.has(id));
+    if (allSelected) {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        pageIds.forEach((id) => next.delete(id));
+        return next;
+      });
     } else {
-      setSelectedIds(new Set(filtered.map((a) => a.id)));
+      setSelectedIds((prev) => new Set([...prev, ...pageIds]));
     }
   };
 
@@ -495,7 +510,7 @@ export default function ApplicationTable({
           </select>
           <select
             value={sentFilter}
-            onChange={(e) => { setSentFilter(e.target.value as "" | "sent" | "unsent" | "failed"); setSelectedIds(new Set()); }}
+            onChange={(e) => { setSentFilter(e.target.value as "" | "sent" | "unsent" | "failed"); setSelectedIds(new Set()); setCurrentPage(1); }}
             className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
           >
             <option value="">발송 전체</option>
@@ -505,7 +520,7 @@ export default function ApplicationTable({
           </select>
           <select
             value={completedFilter}
-            onChange={(e) => { setCompletedFilter(e.target.value as "" | "completed" | "uncompleted"); setSelectedIds(new Set()); }}
+            onChange={(e) => { setCompletedFilter(e.target.value as "" | "completed" | "uncompleted"); setSelectedIds(new Set()); setCurrentPage(1); }}
             className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
           >
             <option value="">제출 전체</option>
@@ -559,8 +574,8 @@ export default function ApplicationTable({
                 <input
                   type="checkbox"
                   checked={
-                    filtered.length > 0 &&
-                    selectedIds.size === filtered.length
+                    paged.length > 0 &&
+                    paged.every((a) => selectedIds.has(a.id))
                   }
                   onChange={toggleSelectAll}
                   className="h-4 w-4 rounded border-gray-300"
@@ -580,7 +595,7 @@ export default function ApplicationTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {filtered.length === 0 ? (
+            {paged.length === 0 ? (
               <tr>
                 <td
                   colSpan={12}
@@ -592,7 +607,7 @@ export default function ApplicationTable({
                 </td>
               </tr>
             ) : (
-              filtered.map((app, idx) => (
+              paged.map((app, idx) => (
                 <tr
                   key={app.id}
                   className="transition-colors hover:bg-gray-50"
@@ -605,7 +620,7 @@ export default function ApplicationTable({
                       className="h-4 w-4 rounded border-gray-300"
                     />
                   </td>
-                  <td className="px-2 py-3 text-gray-400">{idx + 1}</td>
+                  <td className="px-2 py-3 text-gray-400">{(safePage - 1) * PAGE_SIZE + idx + 1}</td>
                   <td className="px-2 py-3 font-medium text-gray-900">
                     {app.name}
                   </td>
@@ -698,6 +713,69 @@ export default function ApplicationTable({
           </tbody>
         </table>
       </div>
+
+      {/* 페이지네이션 */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between border-t px-4 py-3">
+          <span className="text-sm text-gray-500">
+            {filtered.length}건 중 {(safePage - 1) * PAGE_SIZE + 1}–{Math.min(safePage * PAGE_SIZE, filtered.length)}
+          </span>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setCurrentPage(1)}
+              disabled={safePage === 1}
+              className="rounded px-2 py-1 text-sm text-gray-500 hover:bg-gray-100 disabled:opacity-30"
+            >
+              처음
+            </button>
+            <button
+              onClick={() => setCurrentPage(safePage - 1)}
+              disabled={safePage === 1}
+              className="rounded p-1 text-gray-500 hover:bg-gray-100 disabled:opacity-30"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter((p) => p === 1 || p === totalPages || Math.abs(p - safePage) <= 2)
+              .reduce<(number | "...")[]>((acc, p, i, arr) => {
+                if (i > 0 && p - (arr[i - 1] as number) > 1) acc.push("...");
+                acc.push(p);
+                return acc;
+              }, [])
+              .map((p, i) =>
+                p === "..." ? (
+                  <span key={`ellipsis-${i}`} className="px-1 text-sm text-gray-400">…</span>
+                ) : (
+                  <button
+                    key={p}
+                    onClick={() => setCurrentPage(p as number)}
+                    className={`min-w-[32px] rounded px-2 py-1 text-sm ${
+                      p === safePage
+                        ? "bg-primary-600 text-white"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                )
+              )}
+            <button
+              onClick={() => setCurrentPage(safePage + 1)}
+              disabled={safePage === totalPages}
+              className="rounded p-1 text-gray-500 hover:bg-gray-100 disabled:opacity-30"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={safePage === totalPages}
+              className="rounded px-2 py-1 text-sm text-gray-500 hover:bg-gray-100 disabled:opacity-30"
+            >
+              마지막
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 신청자 추가 모달 */}
       {showAddModal && (
