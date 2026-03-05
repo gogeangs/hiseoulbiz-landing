@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminToken } from "@/lib/auth";
-import { updateApplication, deleteApplication, toggleCompleted } from "@/lib/db";
+import { updateApplication, deleteApplication, toggleCompleted, checkDuplicateEmail, getApplicationsByIds } from "@/lib/db";
 import { applicationSchema } from "@/lib/validations";
 
 function getIdFromParams(params: { id: string }): number | null {
@@ -44,6 +44,18 @@ export async function PUT(
         { error: "입력 정보를 확인해 주세요.", details: validated.error.flatten() },
         { status: 400 }
       );
+    }
+
+    // 이메일 변경 시 중복 체크 (자기 자신 제외)
+    const rows = await getApplicationsByIds([id]);
+    if (rows.length > 0 && rows[0].email !== validated.data.email) {
+      const isDuplicate = await checkDuplicateEmail(validated.data.email);
+      if (isDuplicate) {
+        return NextResponse.json(
+          { error: "이미 동일한 이메일로 신청한 내역이 있습니다." },
+          { status: 409 }
+        );
+      }
     }
 
     const updated = await updateApplication(id, {

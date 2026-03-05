@@ -68,6 +68,17 @@ export default function ApplicationTable({
 
   const [togglingId, setTogglingId] = useState<number | null>(null);
 
+  // 클라이언트 사이드 필터링
+  const filtered = applications.filter((app) => {
+    if (sentFilter === "sent" && !app.email_sent_at) return false;
+    if (sentFilter === "unsent" && app.email_sent_at) return false;
+    if (completedFilter === "completed" && !app.completed_at) return false;
+    if (completedFilter === "uncompleted" && app.completed_at) return false;
+    return true;
+  });
+
+  const hasActiveFilter = !!(search || district || sentFilter || completedFilter);
+
   const handleToggleComplete = async (id: number) => {
     setTogglingId(id);
     try {
@@ -321,17 +332,6 @@ export default function ApplicationTable({
     a.click();
     URL.revokeObjectURL(url);
   };
-
-  // 클라이언트 사이드 필터링
-  const filtered = applications.filter((app) => {
-    if (sentFilter === "sent" && !app.email_sent_at) return false;
-    if (sentFilter === "unsent" && app.email_sent_at) return false;
-    if (completedFilter === "completed" && !app.completed_at) return false;
-    if (completedFilter === "uncompleted" && app.completed_at) return false;
-    return true;
-  });
-
-  const hasActiveFilter = !!(search || district || sentFilter || completedFilter);
 
   // 이메일 발송 확인 모달용: 이미 발송된 건수
   const alreadySentCount = filtered.filter(

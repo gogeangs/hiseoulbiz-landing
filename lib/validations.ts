@@ -14,16 +14,20 @@ const BONUS_TARGETS_ENUM = BONUS_TARGETS as unknown as readonly [string, ...stri
 export const applicationSchema = z.object({
   name: z
     .string()
+    .trim()
     .min(2, "이름을 입력해 주세요.")
     .max(20, "이름은 20자 이내로 입력해 주세요."),
   phone: z
     .string()
+    .trim()
     .regex(
       /^01[016789]-?\d{3,4}-?\d{4}$/,
       "올바른 휴대전화 번호를 입력해 주세요. (예: 010-1234-5678)"
     ),
   email: z
     .string()
+    .trim()
+    .toLowerCase()
     .email("올바른 이메일 주소를 입력해 주세요."),
   birthDate: z
     .string()

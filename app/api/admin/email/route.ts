@@ -12,6 +12,15 @@ function getResend() {
   return new Resend(apiKey);
 }
 
+// 첨부파일 모듈 레벨 캐시 (매 요청마다 디스크 I/O 방지)
+let cachedFileContent: Buffer | null = null;
+async function getAttachmentFile(): Promise<Buffer> {
+  if (cachedFileContent) return cachedFileContent;
+  const filePath = path.join(process.cwd(), "public/files/2026매력일자리_참여신청서.hwp");
+  cachedFileContent = await readFile(filePath);
+  return cachedFileContent;
+}
+
 export async function POST(request: NextRequest) {
   const token = request.cookies.get("admin_token")?.value;
   if (!token || !(await verifyAdminToken(token))) {
@@ -45,9 +54,8 @@ export async function POST(request: NextRequest) {
 
     const resend = getResend();
 
-    // 신청서 파일 읽기
-    const filePath = path.join(process.cwd(), "public/files/2026매력일자리_참여신청서.hwp");
-    const fileContent = await readFile(filePath);
+    // 신청서 파일 읽기 (캐시)
+    const fileContent = await getAttachmentFile();
 
     const results: { id: number; success: boolean; error?: string }[] = [];
 
