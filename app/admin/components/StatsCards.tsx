@@ -1,16 +1,14 @@
-import { Users, CalendarPlus, MapPin } from "lucide-react";
+import { Users, CalendarPlus, ClipboardCheck } from "lucide-react";
 
 interface StatsCardsProps {
   stats: {
     total: number;
     today: number;
-    byDistrict: { district: string; count: number }[];
+    completed: number;
   };
 }
 
 export default function StatsCards({ stats }: StatsCardsProps) {
-  const topDistrict = stats.byDistrict[0];
-
   return (
     <div className="mb-8 grid gap-4 sm:grid-cols-3">
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
@@ -44,12 +42,12 @@ export default function StatsCards({ stats }: StatsCardsProps) {
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="rounded-lg bg-amber-50 p-2.5">
-            <MapPin className="h-5 w-5 text-amber-700" />
+            <ClipboardCheck className="h-5 w-5 text-amber-700" />
           </div>
           <div>
-            <p className="text-sm text-gray-500">최다 지역</p>
+            <p className="text-sm text-gray-500">제출 완료</p>
             <p className="text-2xl font-bold text-gray-900">
-              {topDistrict ? `${topDistrict.district} (${topDistrict.count})` : "-"}
+              {stats.completed}명
             </p>
           </div>
         </div>

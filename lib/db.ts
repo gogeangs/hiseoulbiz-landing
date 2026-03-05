@@ -176,18 +176,15 @@ export async function toggleCompleted(id: number): Promise<{ completed: boolean 
 
 export async function getApplicationStats() {
   const sql = getSQL();
-  const [totalResult, districtResult, todayResult] = await Promise.all([
+  const [totalResult, todayResult, completedResult] = await Promise.all([
     sql`SELECT COUNT(*) as count FROM applications`,
-    sql`SELECT district, COUNT(*) as count FROM applications GROUP BY district ORDER BY count DESC`,
     sql`SELECT COUNT(*) as count FROM applications WHERE submitted_at >= (NOW() AT TIME ZONE 'Asia/Seoul')::date`,
+    sql`SELECT COUNT(*) as count FROM applications WHERE completed_at IS NOT NULL`,
   ]);
 
   return {
     total: Number(totalResult[0].count),
     today: Number(todayResult[0].count),
-    byDistrict: districtResult.map((r) => ({
-      district: String(r.district),
-      count: Number(r.count),
-    })),
+    completed: Number(completedResult[0].count),
   };
 }
