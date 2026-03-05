@@ -567,10 +567,10 @@ export default function ApplicationTable({
 
       {/* 테이블 */}
       <div>
-        <table className="w-full table-fixed text-sm [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap">
+        <table className="w-full text-sm [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap">
           <thead>
             <tr className="border-b bg-gray-50 text-left">
-              <th className="w-10 px-3 py-3">
+              <th className="px-3 py-3">
                 <input
                   type="checkbox"
                   checked={
@@ -581,17 +581,17 @@ export default function ApplicationTable({
                   className="h-4 w-4 rounded border-gray-300"
                 />
               </th>
-              <th className="w-10 px-2 py-3 font-medium text-gray-500">#</th>
-              <th className="w-[70px] px-2 py-3 font-medium text-gray-500">이름</th>
-              <th className="w-[120px] px-2 py-3 font-medium text-gray-500">연락처</th>
+              <th className="px-2 py-3 font-medium text-gray-500">#</th>
+              <th className="px-2 py-3 font-medium text-gray-500">이름</th>
+              <th className="px-2 py-3 font-medium text-gray-500">연락처</th>
               <th className="px-2 py-3 font-medium text-gray-500">이메일</th>
-              <th className="w-[100px] px-2 py-3 font-medium text-gray-500">생년월일</th>
-              <th className="w-[70px] px-2 py-3 font-medium text-gray-500">지역</th>
+              <th className="px-2 py-3 font-medium text-gray-500">생년월일</th>
+              <th className="px-2 py-3 font-medium text-gray-500">지역</th>
               <th className="px-2 py-3 font-medium text-gray-500">가점대상</th>
-              <th className="w-[130px] px-2 py-3 font-medium text-gray-500">신청일시</th>
-              <th className="w-[75px] px-2 py-3 font-medium text-gray-500">발송</th>
-              <th className="w-[50px] px-2 py-3 font-medium text-gray-500">제출</th>
-              <th className="w-[70px] px-2 py-3 font-medium text-gray-500">관리</th>
+              <th className="px-2 py-3 font-medium text-gray-500">신청일시</th>
+              <th className="px-2 py-3 font-medium text-gray-500">발송</th>
+              <th className="px-2 py-3 font-medium text-gray-500">제출</th>
+              <th className="px-2 py-3 font-medium text-gray-500">관리</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -625,7 +625,7 @@ export default function ApplicationTable({
                     {app.name}
                   </td>
                   <td className="px-2 py-3 text-gray-600">{app.phone}</td>
-                  <td className="truncate px-2 py-3 text-gray-600" title={app.email}>{app.email}</td>
+                  <td className="px-2 py-3 text-gray-600">{app.email}</td>
                   <td className="px-2 py-3 text-gray-600">
                     {app.birth_date}
                   </td>
