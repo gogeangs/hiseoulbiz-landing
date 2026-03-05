@@ -453,8 +453,8 @@ export default function ApplicationTable({
       )}
 
       {/* 필터 바 */}
-      <div className="flex flex-col gap-3 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-1 gap-3">
+      <div className="flex flex-col gap-3 border-b p-4">
+        <div className="flex flex-wrap gap-2">
           <form onSubmit={handleSearchSubmit} className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <input
@@ -513,7 +513,7 @@ export default function ApplicationTable({
             <option value="uncompleted">미제출</option>
           </select>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           {isPending && (
             <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
           )}
@@ -552,7 +552,7 @@ export default function ApplicationTable({
 
       {/* 테이블 */}
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[1200px] text-sm [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap">
+        <table className="w-full text-sm [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap">
           <thead>
             <tr className="border-b bg-gray-50 text-left">
               <th className="px-4 py-3">
@@ -610,7 +610,7 @@ export default function ApplicationTable({
                     {app.name}
                   </td>
                   <td className="px-4 py-3 text-gray-600">{app.phone}</td>
-                  <td className="px-4 py-3 text-gray-600">{app.email}</td>
+                  <td className="max-w-[180px] truncate px-4 py-3 text-gray-600" title={app.email}>{app.email}</td>
                   <td className="px-4 py-3 text-gray-600">
                     {app.birth_date}
                   </td>
