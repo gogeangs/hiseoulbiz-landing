@@ -14,11 +14,16 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
+
+    // 빈 문자열을 undefined로 변환 (optional 필드)
+    if (body.birthDate === "") body.birthDate = undefined;
+    if (body.district === "") body.district = undefined;
+
     const adminSchema = applicationSchema
       .omit({ privacyConsent: true })
       .extend({
-        birthDate: applicationSchema.shape.birthDate.optional().default(""),
-        district: applicationSchema.shape.district.optional().default("" as never),
+        birthDate: applicationSchema.shape.birthDate.optional(),
+        district: applicationSchema.shape.district.optional(),
       });
 
     const validated = adminSchema.safeParse(body);
@@ -42,8 +47,8 @@ export async function POST(request: NextRequest) {
     const submittedAt = new Date().toISOString();
     await insertApplication({
       ...validated.data,
-      birthDate: validated.data.birthDate || "",
-      district: (validated.data.district || "") as typeof validated.data.district,
+      birthDate: validated.data.birthDate ?? "",
+      district: (validated.data.district ?? "") as "강남구",
       submittedAt,
     });
 
