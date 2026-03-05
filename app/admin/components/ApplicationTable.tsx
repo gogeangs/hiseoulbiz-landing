@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Search, Download, Loader2, Mail, Check, X, Plus, Pencil, Trash2 } from "lucide-react";
+import { Search, Download, Loader2, Mail, Check, X, Plus, Pencil, Trash2, CircleCheck, Circle } from "lucide-react";
 import { SEOUL_DISTRICTS } from "@/lib/validations";
 import { BONUS_TARGETS } from "@/lib/constants";
 import type { ApplicationRow } from "@/lib/db";
@@ -63,6 +63,29 @@ export default function ApplicationTable({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const [togglingId, setTogglingId] = useState<number | null>(null);
+
+  const handleToggleComplete = async (id: number) => {
+    setTogglingId(id);
+    try {
+      const res = await fetch(`/api/admin/applications/${id}`, {
+        method: "PATCH",
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        alert(data?.error || "처리에 실패했습니다.");
+        return;
+      }
+      startTransition(() => {
+        router.refresh();
+      });
+    } catch {
+      alert("처리 중 오류가 발생했습니다.");
+    } finally {
+      setTogglingId(null);
+    }
+  };
 
   const handleAddSubmit = async () => {
     if (!addForm.name || !addForm.phone || !addForm.email) {
@@ -513,6 +536,7 @@ export default function ApplicationTable({
               <th className="px-4 py-3 font-medium text-gray-500">가점대상</th>
               <th className="px-4 py-3 font-medium text-gray-500">신청일시</th>
               <th className="px-4 py-3 font-medium text-gray-500">발송</th>
+              <th className="px-4 py-3 font-medium text-gray-500">제출</th>
               <th className="px-4 py-3 font-medium text-gray-500">관리</th>
             </tr>
           </thead>
@@ -520,7 +544,7 @@ export default function ApplicationTable({
             {applications.length === 0 ? (
               <tr>
                 <td
-                  colSpan={11}
+                  colSpan={12}
                   className="px-4 py-12 text-center text-gray-400"
                 >
                   {search || district
@@ -586,6 +610,22 @@ export default function ApplicationTable({
                     ) : (
                       <span className="text-xs text-gray-300">미발송</span>
                     )}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <button
+                      onClick={() => handleToggleComplete(app.id)}
+                      disabled={togglingId === app.id}
+                      className="inline-flex items-center gap-1 disabled:opacity-50"
+                      title={app.completed_at ? "제출 완료 해제" : "제출 완료 처리"}
+                    >
+                      {togglingId === app.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                      ) : app.completed_at ? (
+                        <CircleCheck className="h-5 w-5 text-green-600" />
+                      ) : (
+                        <Circle className="h-5 w-5 text-gray-300 hover:text-gray-400" />
+                      )}
+                    </button>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">

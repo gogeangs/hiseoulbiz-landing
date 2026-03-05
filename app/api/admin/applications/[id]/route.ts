@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminToken } from "@/lib/auth";
-import { updateApplication, deleteApplication } from "@/lib/db";
+import { updateApplication, deleteApplication, toggleCompleted } from "@/lib/db";
 import { applicationSchema } from "@/lib/validations";
 
 function getIdFromParams(params: { id: string }): number | null {
@@ -67,6 +67,45 @@ export async function PUT(
     console.error("Application update error:", error);
     return NextResponse.json(
       { error: "수정에 실패했습니다." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const token = request.cookies.get("admin_token")?.value;
+  if (!token || !(await verifyAdminToken(token))) {
+    return NextResponse.json(
+      { error: "인증이 필요합니다." },
+      { status: 401 }
+    );
+  }
+
+  const { id: idStr } = await params;
+  const id = getIdFromParams({ id: idStr });
+  if (!id) {
+    return NextResponse.json(
+      { error: "유효하지 않은 ID입니다." },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const result = await toggleCompleted(id);
+    if (!result) {
+      return NextResponse.json(
+        { error: "해당 신청자를 찾을 수 없습니다." },
+        { status: 404 }
+      );
+    }
+    return NextResponse.json({ success: true, completed: result.completed });
+  } catch (error) {
+    console.error("Application toggle complete error:", error);
+    return NextResponse.json(
+      { error: "처리에 실패했습니다." },
       { status: 500 }
     );
   }

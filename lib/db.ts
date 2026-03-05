@@ -24,6 +24,7 @@ export interface ApplicationRow {
   bonus_targets: string[] | null;
   submitted_at: string;
   email_sent_at: string | null;
+  completed_at: string | null;
 }
 
 export async function insertApplication(
@@ -159,6 +160,18 @@ export async function deleteApplication(id: number): Promise<boolean> {
   const sql = getSQL();
   const rows = await sql`DELETE FROM applications WHERE id = ${id} RETURNING id`;
   return rows.length > 0;
+}
+
+export async function toggleCompleted(id: number): Promise<{ completed: boolean } | null> {
+  const sql = getSQL();
+  const rows = await sql`
+    UPDATE applications
+    SET completed_at = CASE WHEN completed_at IS NULL THEN NOW() ELSE NULL END
+    WHERE id = ${id}
+    RETURNING completed_at
+  `;
+  if (rows.length === 0) return null;
+  return { completed: rows[0].completed_at !== null };
 }
 
 export async function getApplicationStats() {
