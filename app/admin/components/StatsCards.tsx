@@ -1,3 +1,6 @@
+"use client";
+
+import { useRouter, useSearchParams } from "next/navigation";
 import { Users, CalendarPlus, ClipboardCheck } from "lucide-react";
 
 interface StatsCardsProps {
@@ -9,49 +12,82 @@ interface StatsCardsProps {
 }
 
 export default function StatsCards({ stats }: StatsCardsProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const activeFilter = searchParams.get("statsFilter") || "";
+
+  const handleClick = (filter: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (activeFilter === filter) {
+      params.delete("statsFilter");
+    } else {
+      params.set("statsFilter", filter);
+    }
+    // 다른 필터 초기화
+    params.delete("search");
+    params.delete("district");
+    router.push(`/admin?${params.toString()}`);
+  };
+
+  const cards = [
+    {
+      key: "all",
+      label: "총 신청",
+      value: stats.total,
+      icon: Users,
+      iconBg: "bg-primary-50",
+      iconColor: "text-primary-700",
+      ringColor: "ring-primary-300",
+    },
+    {
+      key: "today",
+      label: "오늘 신청",
+      value: stats.today,
+      icon: CalendarPlus,
+      iconBg: "bg-green-50",
+      iconColor: "text-green-700",
+      ringColor: "ring-green-300",
+    },
+    {
+      key: "completed",
+      label: "제출 완료",
+      value: stats.completed,
+      icon: ClipboardCheck,
+      iconBg: "bg-amber-50",
+      iconColor: "text-amber-700",
+      ringColor: "ring-amber-300",
+    },
+  ];
+
   return (
     <div className="mb-8 grid gap-4 sm:grid-cols-3">
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="rounded-lg bg-primary-50 p-2.5">
-            <Users className="h-5 w-5 text-primary-700" />
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">총 신청</p>
-            <p className="text-2xl font-bold text-gray-900">
-              {stats.total}명
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="rounded-lg bg-green-50 p-2.5">
-            <CalendarPlus className="h-5 w-5 text-green-700" />
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">오늘 신청</p>
-            <p className="text-2xl font-bold text-gray-900">
-              {stats.today}명
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="rounded-lg bg-amber-50 p-2.5">
-            <ClipboardCheck className="h-5 w-5 text-amber-700" />
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">제출 완료</p>
-            <p className="text-2xl font-bold text-gray-900">
-              {stats.completed}명
-            </p>
-          </div>
-        </div>
-      </div>
+      {cards.map((card) => {
+        const Icon = card.icon;
+        const isActive = activeFilter === card.key;
+        return (
+          <button
+            key={card.key}
+            onClick={() => handleClick(card.key)}
+            className={`rounded-2xl border bg-white p-6 shadow-sm text-left transition-all hover:shadow-md ${
+              isActive
+                ? `border-transparent ring-2 ${card.ringColor}`
+                : "border-gray-100"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className={`rounded-lg ${card.iconBg} p-2.5`}>
+                <Icon className={`h-5 w-5 ${card.iconColor}`} />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">{card.label}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {card.value}명
+                </p>
+              </div>
+            </div>
+          </button>
+        );
+      })}
     </div>
   );
 }

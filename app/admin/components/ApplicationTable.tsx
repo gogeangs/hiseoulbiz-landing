@@ -11,6 +11,7 @@ interface ApplicationTableProps {
   applications: ApplicationRow[];
   initialSearch?: string;
   initialDistrict?: string;
+  statsFilter?: string;
 }
 
 type FormData = {
@@ -35,6 +36,7 @@ export default function ApplicationTable({
   applications,
   initialSearch,
   initialDistrict,
+  statsFilter,
 }: ApplicationTableProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -72,8 +74,18 @@ export default function ApplicationTable({
   const PAGE_SIZE = 20;
   const [currentPage, setCurrentPage] = useState(1);
 
+  // 오늘 날짜 (KST 기준)
+  const todayStr = new Date().toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit" });
+
   // 클라이언트 사이드 필터링
   const filtered = applications.filter((app) => {
+    // statsFilter 적용
+    if (statsFilter === "today") {
+      const appDate = new Date(app.submitted_at).toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit" });
+      if (appDate !== todayStr) return false;
+    }
+    if (statsFilter === "completed" && !app.completed_at) return false;
+
     if (sentFilter === "sent" && !app.email_sent_at) return false;
     if (sentFilter === "failed" && !app.email_error) return false;
     if (sentFilter === "unsent" && (app.email_sent_at || app.email_error)) return false;

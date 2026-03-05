@@ -4,7 +4,7 @@ import StatsCards from "./components/StatsCards";
 import ApplicationTable from "./components/ApplicationTable";
 
 interface AdminPageProps {
-  searchParams: Promise<{ search?: string; district?: string }>;
+  searchParams: Promise<{ search?: string; district?: string; statsFilter?: string }>;
 }
 
 export const dynamic = "force-dynamic";
@@ -27,6 +27,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             applications={applications}
             initialSearch={params.search}
             initialDistrict={params.district}
+            statsFilter={params.statsFilter}
           />
         </main>
       </>
