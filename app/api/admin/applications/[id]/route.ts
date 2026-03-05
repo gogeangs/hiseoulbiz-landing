@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Resend } from "resend";
 import { verifyAdminToken } from "@/lib/auth";
 import { updateApplication, deleteApplication, toggleCompleted, checkDuplicateEmail, getApplicationsByIds } from "@/lib/db";
 import { applicationSchema } from "@/lib/validations";
+import { buildCompletionConfirmEmail } from "@/lib/email-template";
 
 function getIdFromParams(params: { id: string }): number | null {
   const id = Number(params.id);
@@ -113,6 +115,29 @@ export async function PATCH(
         { status: 404 }
       );
     }
+
+    // 제출 완료 체크 시 확인 이메일 발송
+    if (result.completed) {
+      const resendApiKey = process.env.RESEND_API_KEY;
+      if (resendApiKey) {
+        const rows = await getApplicationsByIds([id]);
+        if (rows.length > 0) {
+          const app = rows[0];
+          try {
+            const resend = new Resend(resendApiKey);
+            await resend.emails.send({
+              from: process.env.RESEND_FROM_EMAIL || "하이서울기업협회 <onboarding@resend.dev>",
+              to: app.email,
+              subject: `[하이서울기업협회] ${app.name}님, 서류 제출 확인 완료 안내`,
+              html: buildCompletionConfirmEmail(app.name),
+            });
+          } catch (emailError) {
+            console.error("Completion confirm email failed:", emailError);
+          }
+        }
+      }
+    }
+
     return NextResponse.json({ success: true, completed: result.completed });
   } catch (error) {
     console.error("Application toggle complete error:", error);

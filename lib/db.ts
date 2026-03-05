@@ -184,6 +184,16 @@ export async function toggleCompleted(id: number): Promise<{ completed: boolean 
   return { completed: rows[0].completed_at !== null };
 }
 
+export async function getUncompletedApplications(): Promise<ApplicationRow[]> {
+  const sql = getSQL();
+  const rows = await sql`
+    SELECT * FROM applications
+    WHERE completed_at IS NULL AND email_sent_at IS NOT NULL
+    ORDER BY submitted_at DESC
+  `;
+  return rows as ApplicationRow[];
+}
+
 export async function getApplicationStats() {
   const sql = getSQL();
   const [totalResult, todayResult, completedResult] = await Promise.all([
