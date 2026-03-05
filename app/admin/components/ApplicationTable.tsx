@@ -551,11 +551,11 @@ export default function ApplicationTable({
       </div>
 
       {/* 테이블 */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap">
+      <div>
+        <table className="w-full table-fixed text-sm [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap">
           <thead>
             <tr className="border-b bg-gray-50 text-left">
-              <th className="px-4 py-3">
+              <th className="w-10 px-3 py-3">
                 <input
                   type="checkbox"
                   checked={
@@ -566,17 +566,17 @@ export default function ApplicationTable({
                   className="h-4 w-4 rounded border-gray-300"
                 />
               </th>
-              <th className="px-4 py-3 font-medium text-gray-500">#</th>
-              <th className="px-4 py-3 font-medium text-gray-500">이름</th>
-              <th className="px-4 py-3 font-medium text-gray-500">연락처</th>
-              <th className="px-4 py-3 font-medium text-gray-500">이메일</th>
-              <th className="px-4 py-3 font-medium text-gray-500">생년월일</th>
-              <th className="px-4 py-3 font-medium text-gray-500">지역</th>
-              <th className="px-4 py-3 font-medium text-gray-500">가점대상</th>
-              <th className="px-4 py-3 font-medium text-gray-500">신청일시</th>
-              <th className="px-4 py-3 font-medium text-gray-500">발송</th>
-              <th className="px-4 py-3 font-medium text-gray-500">제출</th>
-              <th className="px-4 py-3 font-medium text-gray-500">관리</th>
+              <th className="w-10 px-2 py-3 font-medium text-gray-500">#</th>
+              <th className="w-[70px] px-2 py-3 font-medium text-gray-500">이름</th>
+              <th className="w-[120px] px-2 py-3 font-medium text-gray-500">연락처</th>
+              <th className="px-2 py-3 font-medium text-gray-500">이메일</th>
+              <th className="w-[100px] px-2 py-3 font-medium text-gray-500">생년월일</th>
+              <th className="w-[70px] px-2 py-3 font-medium text-gray-500">지역</th>
+              <th className="px-2 py-3 font-medium text-gray-500">가점대상</th>
+              <th className="w-[130px] px-2 py-3 font-medium text-gray-500">신청일시</th>
+              <th className="w-[75px] px-2 py-3 font-medium text-gray-500">발송</th>
+              <th className="w-[50px] px-2 py-3 font-medium text-gray-500">제출</th>
+              <th className="w-[70px] px-2 py-3 font-medium text-gray-500">관리</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -584,7 +584,7 @@ export default function ApplicationTable({
               <tr>
                 <td
                   colSpan={12}
-                  className="px-4 py-12 text-center text-gray-400"
+                  className="px-2 py-12 text-center text-gray-400"
                 >
                   {hasActiveFilter
                     ? "검색 결과가 없습니다."
@@ -597,7 +597,7 @@ export default function ApplicationTable({
                   key={app.id}
                   className="transition-colors hover:bg-gray-50"
                 >
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-3">
                     <input
                       type="checkbox"
                       checked={selectedIds.has(app.id)}
@@ -605,17 +605,17 @@ export default function ApplicationTable({
                       className="h-4 w-4 rounded border-gray-300"
                     />
                   </td>
-                  <td className="px-4 py-3 text-gray-400">{idx + 1}</td>
-                  <td className="px-4 py-3 font-medium text-gray-900">
+                  <td className="px-2 py-3 text-gray-400">{idx + 1}</td>
+                  <td className="px-2 py-3 font-medium text-gray-900">
                     {app.name}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{app.phone}</td>
-                  <td className="max-w-[180px] truncate px-4 py-3 text-gray-600" title={app.email}>{app.email}</td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-2 py-3 text-gray-600">{app.phone}</td>
+                  <td className="truncate px-2 py-3 text-gray-600" title={app.email}>{app.email}</td>
+                  <td className="px-2 py-3 text-gray-600">
                     {app.birth_date}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{app.district}</td>
-                  <td className="px-4 py-3 !whitespace-normal">
+                  <td className="px-2 py-3 text-gray-600">{app.district}</td>
+                  <td className="px-2 py-3 !whitespace-normal">
                     {app.bonus_targets && app.bonus_targets.length > 0 ? (
                       <div className="flex flex-wrap gap-1">
                         {app.bonus_targets.map((t) => (
@@ -631,7 +631,7 @@ export default function ApplicationTable({
                       <span className="text-gray-300">-</span>
                     )}
                   </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-gray-500">
+                  <td className="whitespace-nowrap px-2 py-3 text-gray-500">
                     {new Date(app.submitted_at).toLocaleString("ko-KR", {
                       year: "numeric",
                       month: "2-digit",
@@ -640,7 +640,7 @@ export default function ApplicationTable({
                       minute: "2-digit",
                     })}
                   </td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-2 py-3 text-center">
                     {app.email_sent_at ? (
                       <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs text-green-700">
                         <Check className="h-3 w-3" />
@@ -658,7 +658,7 @@ export default function ApplicationTable({
                       <span className="text-xs text-gray-300">미발송</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-2 py-3 text-center">
                     <button
                       onClick={() => handleToggleComplete(app.id)}
                       disabled={togglingId === app.id}
@@ -674,7 +674,7 @@ export default function ApplicationTable({
                       )}
                     </button>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-2 py-3">
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => openEditModal(app)}

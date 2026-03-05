@@ -21,7 +21,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     return (
       <>
         <AdminHeader />
-        <main className="mx-auto max-w-7xl px-4 py-8">
+        <main className="px-4 py-8">
           <StatsCards stats={stats} />
           <ApplicationTable
             applications={applications}
@@ -36,7 +36,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     return (
       <>
         <AdminHeader />
-        <main className="mx-auto max-w-7xl px-4 py-8">
+        <main className="px-4 py-8">
           <div className="rounded-2xl border border-red-100 bg-red-50 p-8 text-center">
             <p className="text-red-600">
               데이터를 불러오는 중 오류가 발생했습니다. 잠시 후 새로고침해 주세요.
