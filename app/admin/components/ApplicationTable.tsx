@@ -40,6 +40,8 @@ export default function ApplicationTable({
   const [isPending, startTransition] = useTransition();
   const [search, setSearch] = useState(initialSearch ?? "");
   const [district, setDistrict] = useState(initialDistrict ?? "");
+  const [sentFilter, setSentFilter] = useState<"" | "sent" | "unsent">("");
+  const [completedFilter, setCompletedFilter] = useState<"" | "completed" | "uncompleted">("");
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [isSending, setIsSending] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -234,10 +236,10 @@ export default function ApplicationTable({
   };
 
   const toggleSelectAll = () => {
-    if (selectedIds.size === applications.length) {
+    if (selectedIds.size === filtered.length) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(applications.map((a) => a.id)));
+      setSelectedIds(new Set(filtered.map((a) => a.id)));
     }
   };
 
@@ -292,7 +294,7 @@ export default function ApplicationTable({
       "신청일시",
       "이메일발송",
     ];
-    const rows = applications.map((app, idx) => [
+    const rows = filtered.map((app, idx) => [
       idx + 1,
       app.name,
       app.phone,
@@ -320,8 +322,19 @@ export default function ApplicationTable({
     URL.revokeObjectURL(url);
   };
 
+  // 클라이언트 사이드 필터링
+  const filtered = applications.filter((app) => {
+    if (sentFilter === "sent" && !app.email_sent_at) return false;
+    if (sentFilter === "unsent" && app.email_sent_at) return false;
+    if (completedFilter === "completed" && !app.completed_at) return false;
+    if (completedFilter === "uncompleted" && app.completed_at) return false;
+    return true;
+  });
+
+  const hasActiveFilter = !!(search || district || sentFilter || completedFilter);
+
   // 이메일 발송 확인 모달용: 이미 발송된 건수
-  const alreadySentCount = applications.filter(
+  const alreadySentCount = filtered.filter(
     (a) => selectedIds.has(a.id) && a.email_sent_at
   ).length;
 
@@ -446,12 +459,14 @@ export default function ApplicationTable({
               placeholder="이름, 연락처, 이메일 검색"
               className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-9 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
             />
-            {(search || district) && (
+            {hasActiveFilter && (
               <button
                 type="button"
                 onClick={() => {
                   setSearch("");
                   setDistrict("");
+                  setSentFilter("");
+                  setCompletedFilter("");
                   applyFilters("", "");
                 }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
@@ -473,13 +488,31 @@ export default function ApplicationTable({
               </option>
             ))}
           </select>
+          <select
+            value={sentFilter}
+            onChange={(e) => { setSentFilter(e.target.value as "" | "sent" | "unsent"); setSelectedIds(new Set()); }}
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+          >
+            <option value="">발송 전체</option>
+            <option value="sent">발송완료</option>
+            <option value="unsent">미발송</option>
+          </select>
+          <select
+            value={completedFilter}
+            onChange={(e) => { setCompletedFilter(e.target.value as "" | "completed" | "uncompleted"); setSelectedIds(new Set()); }}
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+          >
+            <option value="">제출 전체</option>
+            <option value="completed">제출완료</option>
+            <option value="uncompleted">미제출</option>
+          </select>
         </div>
         <div className="flex items-center gap-3">
           {isPending && (
             <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
           )}
           <span className="text-sm text-gray-500">
-            총 {applications.length}건
+            총 {filtered.length}건
           </span>
           <button
             onClick={() => setShowConfirmModal(true)}
@@ -502,7 +535,7 @@ export default function ApplicationTable({
           </button>
           <button
             onClick={handleExport}
-            disabled={applications.length === 0}
+            disabled={filtered.length === 0}
             className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Download className="h-4 w-4" />
@@ -520,8 +553,8 @@ export default function ApplicationTable({
                 <input
                   type="checkbox"
                   checked={
-                    applications.length > 0 &&
-                    selectedIds.size === applications.length
+                    filtered.length > 0 &&
+                    selectedIds.size === filtered.length
                   }
                   onChange={toggleSelectAll}
                   className="h-4 w-4 rounded border-gray-300"
@@ -541,19 +574,19 @@ export default function ApplicationTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {applications.length === 0 ? (
+            {filtered.length === 0 ? (
               <tr>
                 <td
                   colSpan={12}
                   className="px-4 py-12 text-center text-gray-400"
                 >
-                  {search || district
+                  {hasActiveFilter
                     ? "검색 결과가 없습니다."
                     : "아직 신청 데이터가 없습니다."}
                 </td>
               </tr>
             ) : (
-              applications.map((app, idx) => (
+              filtered.map((app, idx) => (
                 <tr
                   key={app.id}
                   className="transition-colors hover:bg-gray-50"
