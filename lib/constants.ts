@@ -27,7 +27,7 @@ export const PROGRAM = {
   contact: {
     department: "교육사업부",
     phone: "070-5067-0623",
-    email: "hiseoulbiz@naver.com",
+    email: "contact@itso.co.kr",
   },
 };
 
