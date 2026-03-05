@@ -24,6 +24,7 @@ export interface ApplicationRow {
   bonus_targets: string[] | null;
   submitted_at: string;
   email_sent_at: string | null;
+  email_error: string | null;
   completed_at: string | null;
 }
 
@@ -120,7 +121,14 @@ export async function getApplicationsByIds(
 export async function markEmailSent(ids: number[]): Promise<void> {
   const sql = getSQL();
   await sql`
-    UPDATE applications SET email_sent_at = NOW() WHERE id = ANY(${ids})
+    UPDATE applications SET email_sent_at = NOW(), email_error = NULL WHERE id = ANY(${ids})
+  `;
+}
+
+export async function markEmailFailed(ids: number[], error: string): Promise<void> {
+  const sql = getSQL();
+  await sql`
+    UPDATE applications SET email_error = ${error} WHERE id = ANY(${ids})
   `;
 }
 

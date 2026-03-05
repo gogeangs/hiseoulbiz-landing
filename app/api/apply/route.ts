@@ -3,7 +3,7 @@ import { readFile } from "fs/promises";
 import path from "path";
 import { Resend } from "resend";
 import { applicationSchema } from "@/lib/validations";
-import { insertApplication, DuplicateEmailError, checkDuplicateEmail, markEmailSent } from "@/lib/db";
+import { insertApplication, DuplicateEmailError, checkDuplicateEmail, markEmailSent, markEmailFailed } from "@/lib/db";
 import { DEADLINE_ISO } from "@/lib/constants";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { buildApplicationGuideEmail } from "@/lib/email-template";
@@ -119,6 +119,8 @@ export async function POST(request: NextRequest) {
         await markEmailSent([insertedId]);
       } catch (emailError) {
         console.error("Auto email send failed:", emailError);
+        const errMsg = emailError instanceof Error ? emailError.message : "발송 실패";
+        await markEmailFailed([insertedId], errMsg).catch(() => {});
       }
     }
 

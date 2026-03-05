@@ -40,7 +40,7 @@ export default function ApplicationTable({
   const [isPending, startTransition] = useTransition();
   const [search, setSearch] = useState(initialSearch ?? "");
   const [district, setDistrict] = useState(initialDistrict ?? "");
-  const [sentFilter, setSentFilter] = useState<"" | "sent" | "unsent">("");
+  const [sentFilter, setSentFilter] = useState<"" | "sent" | "unsent" | "failed">("");
   const [completedFilter, setCompletedFilter] = useState<"" | "completed" | "uncompleted">("");
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [isSending, setIsSending] = useState(false);
@@ -71,7 +71,8 @@ export default function ApplicationTable({
   // 클라이언트 사이드 필터링
   const filtered = applications.filter((app) => {
     if (sentFilter === "sent" && !app.email_sent_at) return false;
-    if (sentFilter === "unsent" && app.email_sent_at) return false;
+    if (sentFilter === "failed" && !app.email_error) return false;
+    if (sentFilter === "unsent" && (app.email_sent_at || app.email_error)) return false;
     if (completedFilter === "completed" && !app.completed_at) return false;
     if (completedFilter === "uncompleted" && app.completed_at) return false;
     return true;
@@ -494,11 +495,12 @@ export default function ApplicationTable({
           </select>
           <select
             value={sentFilter}
-            onChange={(e) => { setSentFilter(e.target.value as "" | "sent" | "unsent"); setSelectedIds(new Set()); }}
+            onChange={(e) => { setSentFilter(e.target.value as "" | "sent" | "unsent" | "failed"); setSelectedIds(new Set()); }}
             className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
           >
             <option value="">발송 전체</option>
             <option value="sent">발송완료</option>
+            <option value="failed">발송실패</option>
             <option value="unsent">미발송</option>
           </select>
           <select
@@ -643,6 +645,14 @@ export default function ApplicationTable({
                       <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs text-green-700">
                         <Check className="h-3 w-3" />
                         발송완료
+                      </span>
+                    ) : app.email_error ? (
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-xs text-red-700 cursor-help"
+                        title={app.email_error}
+                      >
+                        <X className="h-3 w-3" />
+                        발송실패
                       </span>
                     ) : (
                       <span className="text-xs text-gray-300">미발송</span>

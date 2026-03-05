@@ -3,7 +3,7 @@ import { readFile } from "fs/promises";
 import path from "path";
 import { Resend } from "resend";
 import { verifyAdminToken } from "@/lib/auth";
-import { getApplicationsByIds, markEmailSent } from "@/lib/db";
+import { getApplicationsByIds, markEmailSent, markEmailFailed } from "@/lib/db";
 import { buildApplicationGuideEmail } from "@/lib/email-template";
 
 function getResend() {
@@ -98,13 +98,19 @@ export async function POST(request: NextRequest) {
     }
 
     const sentIds = results.filter((r) => r.success).map((r) => r.id);
+    const failedResults = results.filter((r) => !r.success);
+
     if (sentIds.length > 0) {
       await markEmailSent(sentIds);
+    }
+    if (failedResults.length > 0) {
+      const failedIds = failedResults.map((r) => r.id);
+      await markEmailFailed(failedIds, failedResults[0].error || "발송 실패");
     }
 
     return NextResponse.json({
       sent: sentIds.length,
-      failed: results.filter((r) => !r.success).length,
+      failed: failedResults.length,
     });
   } catch (error) {
     console.error("Email send error:", error);
