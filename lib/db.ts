@@ -29,7 +29,7 @@ export interface ApplicationRow {
 
 export async function insertApplication(
   data: Omit<ApplicationFormData, "privacyConsent"> & { submittedAt: string }
-) {
+): Promise<number> {
   const sql = getSQL();
   const { name, phone, email, birthDate, district, bonusTargets, submittedAt } =
     data;
@@ -39,7 +39,7 @@ export async function insertApplication(
       ? JSON.stringify(bonusTargets)
       : null;
   try {
-    await sql`
+    const rows = await sql`
       INSERT INTO applications (name, phone, email, birth_date, district, bonus_targets, submitted_at)
       VALUES (${name}, ${phone}, ${email}, ${birthDate}, ${district},
         CASE WHEN ${targets}::text IS NOT NULL
@@ -47,7 +47,9 @@ export async function insertApplication(
           ELSE NULL
         END,
         ${submittedAt})
+      RETURNING id
     `;
+    return rows[0].id as number;
   } catch (error: unknown) {
     // UNIQUE 제약 위반 (이메일 중복)
     if (error instanceof Error && error.message.includes("idx_applications_email_unique")) {

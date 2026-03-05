@@ -1,8 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
+import { readFile } from "fs/promises";
+import path from "path";
+import { Resend } from "resend";
 import { applicationSchema } from "@/lib/validations";
-import { insertApplication, checkDuplicateEmail } from "@/lib/db";
+import { insertApplication, checkDuplicateEmail, markEmailSent } from "@/lib/db";
 import { DEADLINE_ISO } from "@/lib/constants";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { buildApplicationGuideEmail } from "@/lib/email-template";
+
+// 첨부파일 모듈 레벨 캐시
+let cachedFileContent: Buffer | null = null;
+async function getAttachmentFile(): Promise<Buffer> {
+  if (cachedFileContent) return cachedFileContent;
+  const filePath = path.join(process.cwd(), "public/files/2026매력일자리_참여신청서.hwp");
+  cachedFileContent = await readFile(filePath);
+  return cachedFileContent;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -76,6 +89,33 @@ export async function POST(request: NextRequest) {
     // GAS 실패는 로그만 남김 (DB가 primary)
     if (gasResult.status === "rejected") {
       console.error("GAS webhook failed:", gasResult.reason);
+    }
+
+    // 자동 이메일 발송 (fire-and-forget: 실패해도 신청 성공 응답에 영향 없음)
+    const insertedId = dbResult.value;
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (resendApiKey) {
+      (async () => {
+        try {
+          const resend = new Resend(resendApiKey);
+          const fileContent = await getAttachmentFile();
+          await resend.emails.send({
+            from: process.env.RESEND_FROM_EMAIL || "하이서울기업협회 <onboarding@resend.dev>",
+            to: formData.email,
+            subject: `[하이서울기업협회] ${formData.name}님, 신청 접수 확인 및 신청서 안내`,
+            html: buildApplicationGuideEmail(formData.name),
+            attachments: [
+              {
+                filename: "2026매력일자리_참여신청서.hwp",
+                content: fileContent,
+              },
+            ],
+          });
+          await markEmailSent([insertedId]);
+        } catch (emailError) {
+          console.error("Auto email send failed:", emailError);
+        }
+      })();
     }
 
     return NextResponse.json({ success: true });
