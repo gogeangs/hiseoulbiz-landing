@@ -304,6 +304,7 @@ export default function ApplicationTable({
       "가점대상",
       "신청일시",
       "이메일발송",
+      "제출완료",
     ];
     const rows = filtered.map((app, idx) => [
       idx + 1,
@@ -317,6 +318,9 @@ export default function ApplicationTable({
       app.email_sent_at
         ? new Date(app.email_sent_at).toLocaleString("ko-KR")
         : "미발송",
+      app.completed_at
+        ? new Date(app.completed_at).toLocaleString("ko-KR")
+        : "미완료",
     ]);
 
     const bom = "\uFEFF";
