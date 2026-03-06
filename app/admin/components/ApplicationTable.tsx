@@ -332,6 +332,7 @@ export default function ApplicationTable({
       "가점대상",
       "신청일시",
       "이메일발송",
+      "문자발송",
       "제출완료",
     ];
     const rows = filtered.map((app, idx) => [
@@ -345,6 +346,9 @@ export default function ApplicationTable({
       new Date(app.submitted_at).toLocaleString("ko-KR"),
       app.email_sent_at
         ? new Date(app.email_sent_at).toLocaleString("ko-KR")
+        : "미발송",
+      app.sms_sent_at
+        ? new Date(app.sms_sent_at).toLocaleString("ko-KR")
         : "미발송",
       app.completed_at
         ? new Date(app.completed_at).toLocaleString("ko-KR")
@@ -601,7 +605,8 @@ export default function ApplicationTable({
               <th className="px-2 py-3 font-medium text-gray-500">지역</th>
               <th className="px-2 py-3 font-medium text-gray-500">가점대상</th>
               <th className="px-2 py-3 font-medium text-gray-500">신청일시</th>
-              <th className="px-2 py-3 font-medium text-gray-500">발송</th>
+              <th className="px-2 py-3 font-medium text-gray-500">메일</th>
+              <th className="px-2 py-3 font-medium text-gray-500">문자</th>
               <th className="px-2 py-3 font-medium text-gray-500">제출</th>
               <th className="px-2 py-3 font-medium text-gray-500">관리</th>
             </tr>
@@ -610,7 +615,7 @@ export default function ApplicationTable({
             {paged.length === 0 ? (
               <tr>
                 <td
-                  colSpan={12}
+                  colSpan={13}
                   className="px-2 py-12 text-center text-gray-400"
                 >
                   {hasActiveFilter
@@ -677,6 +682,24 @@ export default function ApplicationTable({
                       <span
                         className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-xs text-red-700 cursor-help"
                         title={app.email_error}
+                      >
+                        <X className="h-3 w-3" />
+                        발송실패
+                      </span>
+                    ) : (
+                      <span className="text-xs text-gray-300">미발송</span>
+                    )}
+                  </td>
+                  <td className="px-2 py-3 text-center">
+                    {app.sms_sent_at ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs text-green-700">
+                        <Check className="h-3 w-3" />
+                        발송완료
+                      </span>
+                    ) : app.sms_error ? (
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-xs text-red-700 cursor-help"
+                        title={app.sms_error}
                       >
                         <X className="h-3 w-3" />
                         발송실패

@@ -3,10 +3,11 @@ import { readFile } from "fs/promises";
 import path from "path";
 import { Resend } from "resend";
 import { applicationSchema } from "@/lib/validations";
-import { insertApplication, DuplicateEmailError, checkDuplicateEmail, markEmailSent, markEmailFailed } from "@/lib/db";
+import { insertApplication, DuplicateEmailError, checkDuplicateEmail, markEmailSent, markEmailFailed, markSmsSent, markSmsFailed } from "@/lib/db";
 import { DEADLINE_ISO } from "@/lib/constants";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { buildApplicationGuideEmail } from "@/lib/email-template";
+import { sendSms } from "@/lib/sms";
 
 // 첨부파일 모듈 레벨 캐시
 let cachedFileContent: Buffer | null = null;
@@ -122,6 +123,21 @@ export async function POST(request: NextRequest) {
         const errMsg = emailError instanceof Error ? emailError.message : "발송 실패";
         await markEmailFailed([insertedId], errMsg).catch(() => {});
       }
+    }
+
+    // 자동 SMS 발송 (실패해도 신청 성공 응답에 영향 없음)
+    try {
+      const smsResult = await sendSms({ receiver: formData.phone, name: formData.name });
+      if (smsResult.success) {
+        await markSmsSent([insertedId]);
+      } else {
+        console.error("Auto SMS send failed:", smsResult.error);
+        await markSmsFailed([insertedId], smsResult.error || "발송 실패").catch(() => {});
+      }
+    } catch (smsError) {
+      console.error("Auto SMS send error:", smsError);
+      const errMsg = smsError instanceof Error ? smsError.message : "발송 실패";
+      await markSmsFailed([insertedId], errMsg).catch(() => {});
     }
 
     return NextResponse.json({ success: true });

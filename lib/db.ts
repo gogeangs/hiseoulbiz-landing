@@ -25,6 +25,8 @@ export interface ApplicationRow {
   submitted_at: string;
   email_sent_at: string | null;
   email_error: string | null;
+  sms_sent_at: string | null;
+  sms_error: string | null;
   completed_at: string | null;
 }
 
@@ -192,6 +194,20 @@ export async function getUncompletedApplications(): Promise<ApplicationRow[]> {
     ORDER BY submitted_at DESC
   `;
   return rows as ApplicationRow[];
+}
+
+export async function markSmsSent(ids: number[]): Promise<void> {
+  const sql = getSQL();
+  await sql`
+    UPDATE applications SET sms_sent_at = NOW(), sms_error = NULL WHERE id = ANY(${ids})
+  `;
+}
+
+export async function markSmsFailed(ids: number[], error: string): Promise<void> {
+  const sql = getSQL();
+  await sql`
+    UPDATE applications SET sms_error = ${error} WHERE id = ANY(${ids})
+  `;
 }
 
 export async function getApplicationStats() {

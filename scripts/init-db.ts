@@ -35,6 +35,16 @@ async function initDb() {
     ADD COLUMN IF NOT EXISTS email_error TEXT DEFAULT NULL
   `;
 
+  // SMS 발송 상태
+  await sql`
+    ALTER TABLE applications
+    ADD COLUMN IF NOT EXISTS sms_sent_at TIMESTAMPTZ DEFAULT NULL
+  `;
+  await sql`
+    ALTER TABLE applications
+    ADD COLUMN IF NOT EXISTS sms_error TEXT DEFAULT NULL
+  `;
+
   // 이메일 유니크 제약 (중복 신청 방지)
   await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_applications_email_unique ON applications(email)`;
 
