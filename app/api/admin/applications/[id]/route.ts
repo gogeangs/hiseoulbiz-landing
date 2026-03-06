@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { verifyAdminToken } from "@/lib/auth";
-import { updateApplication, deleteApplication, toggleCompleted, checkDuplicateEmail, getApplicationsByIds } from "@/lib/db";
+import { updateApplication, deleteApplication, toggleCompleted, toggleSmsSent, checkDuplicateEmail, getApplicationsByIds } from "@/lib/db";
 import { applicationSchema } from "@/lib/validations";
 import { buildCompletionConfirmEmail } from "@/lib/email-template";
 
@@ -108,6 +108,22 @@ export async function PATCH(
   }
 
   try {
+    const body = await request.json().catch(() => ({}));
+    const field = (body as { field?: string }).field;
+
+    // SMS 토글
+    if (field === "sms") {
+      const smsResult = await toggleSmsSent(id);
+      if (!smsResult) {
+        return NextResponse.json(
+          { error: "해당 신청자를 찾을 수 없습니다." },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({ success: true, smsSent: smsResult.smsSent });
+    }
+
+    // 제출 완료 토글
     const result = await toggleCompleted(id);
     if (!result) {
       return NextResponse.json(

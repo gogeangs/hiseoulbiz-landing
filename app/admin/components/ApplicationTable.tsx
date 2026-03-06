@@ -69,6 +69,7 @@ export default function ApplicationTable({
   const [isDeleting, setIsDeleting] = useState(false);
 
   const [togglingId, setTogglingId] = useState<number | null>(null);
+  const [togglingSmsId, setTogglingSmsId] = useState<number | null>(null);
 
   // 페이지네이션
   const PAGE_SIZE = 20;
@@ -99,6 +100,29 @@ export default function ApplicationTable({
   const paged = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   const hasActiveFilter = !!(search || district || sentFilter || completedFilter);
+
+  const handleToggleSms = async (id: number) => {
+    setTogglingSmsId(id);
+    try {
+      const res = await fetch(`/api/admin/applications/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ field: "sms" }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        alert(data?.error || "처리에 실패했습니다.");
+        return;
+      }
+      startTransition(() => {
+        router.refresh();
+      });
+    } catch {
+      alert("처리 중 오류가 발생했습니다.");
+    } finally {
+      setTogglingSmsId(null);
+    }
+  };
 
   const handleToggleComplete = async (id: number) => {
     setTogglingId(id);
@@ -691,22 +715,20 @@ export default function ApplicationTable({
                     )}
                   </td>
                   <td className="px-2 py-3 text-center">
-                    {app.sms_sent_at ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs text-green-700">
-                        <Check className="h-3 w-3" />
-                        발송완료
-                      </span>
-                    ) : app.sms_error ? (
-                      <span
-                        className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-xs text-red-700 cursor-help"
-                        title={app.sms_error}
-                      >
-                        <X className="h-3 w-3" />
-                        발송실패
-                      </span>
-                    ) : (
-                      <span className="text-xs text-gray-300">미발송</span>
-                    )}
+                    <button
+                      onClick={() => handleToggleSms(app.id)}
+                      disabled={togglingSmsId === app.id}
+                      className="inline-flex items-center gap-1 disabled:opacity-50"
+                      title={app.sms_sent_at ? "발송완료 해제" : "발송완료 처리"}
+                    >
+                      {togglingSmsId === app.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                      ) : app.sms_sent_at ? (
+                        <CircleCheck className="h-5 w-5 text-green-600" />
+                      ) : (
+                        <Circle className="h-5 w-5 text-gray-300 hover:text-gray-400" />
+                      )}
+                    </button>
                   </td>
                   <td className="px-2 py-3 text-center">
                     <button

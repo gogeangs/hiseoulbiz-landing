@@ -196,18 +196,17 @@ export async function getUncompletedApplications(): Promise<ApplicationRow[]> {
   return rows as ApplicationRow[];
 }
 
-export async function markSmsSent(ids: number[]): Promise<void> {
+export async function toggleSmsSent(id: number): Promise<{ smsSent: boolean } | null> {
   const sql = getSQL();
-  await sql`
-    UPDATE applications SET sms_sent_at = NOW(), sms_error = NULL WHERE id = ANY(${ids})
+  const rows = await sql`
+    UPDATE applications
+    SET sms_sent_at = CASE WHEN sms_sent_at IS NULL THEN NOW() ELSE NULL END,
+        sms_error = NULL
+    WHERE id = ${id}
+    RETURNING sms_sent_at
   `;
-}
-
-export async function markSmsFailed(ids: number[], error: string): Promise<void> {
-  const sql = getSQL();
-  await sql`
-    UPDATE applications SET sms_error = ${error} WHERE id = ANY(${ids})
-  `;
+  if (rows.length === 0) return null;
+  return { smsSent: rows[0].sms_sent_at !== null };
 }
 
 export async function getApplicationStats() {
