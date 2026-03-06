@@ -606,11 +606,11 @@ export default function ApplicationTable({
       </div>
 
       {/* 테이블 */}
-      <div>
+      <div className="overflow-x-auto">
         <table className="w-full text-sm [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap">
           <thead>
             <tr className="border-b bg-gray-50 text-left">
-              <th className="px-3 py-3">
+              <th className="w-10 px-3 py-3 text-center">
                 <input
                   type="checkbox"
                   checked={
@@ -621,18 +621,18 @@ export default function ApplicationTable({
                   className="h-4 w-4 rounded border-gray-300"
                 />
               </th>
-              <th className="px-2 py-3 font-medium text-gray-500">#</th>
-              <th className="px-2 py-3 font-medium text-gray-500">이름</th>
+              <th className="w-10 px-2 py-3 text-center font-medium text-gray-500">#</th>
+              <th className="w-20 px-2 py-3 font-medium text-gray-500">이름</th>
               <th className="px-2 py-3 font-medium text-gray-500">연락처</th>
               <th className="px-2 py-3 font-medium text-gray-500">이메일</th>
               <th className="px-2 py-3 font-medium text-gray-500">생년월일</th>
-              <th className="px-2 py-3 font-medium text-gray-500">지역</th>
+              <th className="w-16 px-2 py-3 font-medium text-gray-500">지역</th>
               <th className="px-2 py-3 font-medium text-gray-500">가점대상</th>
               <th className="px-2 py-3 font-medium text-gray-500">신청일시</th>
-              <th className="px-2 py-3 font-medium text-gray-500">메일</th>
-              <th className="px-2 py-3 font-medium text-gray-500">문자</th>
-              <th className="px-2 py-3 font-medium text-gray-500">제출</th>
-              <th className="px-2 py-3 font-medium text-gray-500">관리</th>
+              <th className="w-16 px-2 py-3 text-center font-medium text-gray-500">메일</th>
+              <th className="w-12 px-2 py-3 text-center font-medium text-gray-500">문자</th>
+              <th className="w-12 px-2 py-3 text-center font-medium text-gray-500">제출</th>
+              <th className="w-16 px-2 py-3 text-center font-medium text-gray-500">관리</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -653,7 +653,7 @@ export default function ApplicationTable({
                   key={app.id}
                   className="transition-colors hover:bg-gray-50"
                 >
-                  <td className="px-3 py-3">
+                  <td className="px-3 py-3 text-center">
                     <input
                       type="checkbox"
                       checked={selectedIds.has(app.id)}
@@ -661,7 +661,7 @@ export default function ApplicationTable({
                       className="h-4 w-4 rounded border-gray-300"
                     />
                   </td>
-                  <td className="px-2 py-3 text-gray-400">{(safePage - 1) * PAGE_SIZE + idx + 1}</td>
+                  <td className="px-2 py-3 text-center text-gray-400">{(safePage - 1) * PAGE_SIZE + idx + 1}</td>
                   <td className="px-2 py-3 font-medium text-gray-900">
                     {app.name}
                   </td>
@@ -698,20 +698,16 @@ export default function ApplicationTable({
                   </td>
                   <td className="px-2 py-3 text-center">
                     {app.email_sent_at ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs text-green-700">
-                        <Check className="h-3 w-3" />
-                        발송완료
-                      </span>
+                      <CircleCheck className="mx-auto h-5 w-5 text-green-600" />
                     ) : app.email_error ? (
                       <span
-                        className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-xs text-red-700 cursor-help"
+                        className="cursor-help"
                         title={app.email_error}
                       >
-                        <X className="h-3 w-3" />
-                        발송실패
+                        <X className="mx-auto h-5 w-5 text-red-500" />
                       </span>
                     ) : (
-                      <span className="text-xs text-gray-300">미발송</span>
+                      <Circle className="mx-auto h-5 w-5 text-gray-300" />
                     )}
                   </td>
                   <td className="px-2 py-3 text-center">
@@ -746,8 +742,8 @@ export default function ApplicationTable({
                       )}
                     </button>
                   </td>
-                  <td className="px-2 py-3">
-                    <div className="flex items-center gap-1">
+                  <td className="px-2 py-3 text-center">
+                    <div className="inline-flex items-center gap-1">
                       <button
                         onClick={() => openEditModal(app)}
                         className="rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
