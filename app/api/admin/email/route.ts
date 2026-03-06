@@ -3,9 +3,8 @@ import { readFile } from "fs/promises";
 import path from "path";
 import { Resend } from "resend";
 import { verifyAdminToken } from "@/lib/auth";
-import { getApplicationsByIds, markEmailSent, markEmailFailed, markSmsSent, markSmsFailed } from "@/lib/db";
+import { getApplicationsByIds, markEmailSent, markEmailFailed } from "@/lib/db";
 import { buildApplicationGuideEmail } from "@/lib/email-template";
-import { sendSms } from "@/lib/sms";
 
 function getResend() {
   const apiKey = process.env.RESEND_API_KEY;
@@ -78,14 +77,6 @@ export async function POST(request: NextRequest) {
               },
             ],
           });
-          // 이메일 발송 성공 시 SMS도 발송
-          const smsResult = await sendSms({ receiver: app.phone, name: app.name });
-          if (smsResult.success) {
-            await markSmsSent([app.id]);
-          } else {
-            console.error(`SMS failed for ID ${app.id}:`, smsResult.error);
-            await markSmsFailed([app.id], smsResult.error || "발송 실패").catch(() => {});
-          }
           return app.id;
         })
       );
