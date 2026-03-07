@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Search, Download, Loader2, Mail, Check, X, Plus, Pencil, Trash2, CircleCheck, Circle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Download, Loader2, Mail, X, Plus, Pencil, Trash2, CircleCheck, Circle, ChevronLeft, ChevronRight } from "lucide-react";
 import { SEOUL_DISTRICTS } from "@/lib/validations";
 import { BONUS_TARGETS } from "@/lib/constants";
 import type { ApplicationRow } from "@/lib/db";
