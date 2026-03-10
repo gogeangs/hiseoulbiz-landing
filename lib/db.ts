@@ -228,15 +228,17 @@ export async function updateMemo(id: number, memo: string): Promise<boolean> {
 
 export async function getApplicationStats() {
   const sql = getSQL();
-  const [totalResult, todayResult, completedResult] = await Promise.all([
+  const [totalResult, todayResult, completedResult, guidedResult] = await Promise.all([
     sql`SELECT COUNT(*) as count FROM applications`,
     sql`SELECT COUNT(*) as count FROM applications WHERE submitted_at >= (NOW() AT TIME ZONE 'Asia/Seoul')::date`,
     sql`SELECT COUNT(*) as count FROM applications WHERE completed_at IS NOT NULL`,
+    sql`SELECT COUNT(*) as count FROM applications WHERE email_sent_at IS NOT NULL AND sms_sent_at IS NOT NULL`,
   ]);
 
   return {
     total: Number(totalResult[0].count),
     today: Number(todayResult[0].count),
     completed: Number(completedResult[0].count),
+    guided: Number(guidedResult[0].count),
   };
 }

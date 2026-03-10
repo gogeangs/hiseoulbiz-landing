@@ -1,13 +1,14 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Users, CalendarPlus, ClipboardCheck } from "lucide-react";
+import { Users, CalendarPlus, ClipboardCheck, MailCheck } from "lucide-react";
 
 interface StatsCardsProps {
   stats: {
     total: number;
     today: number;
     completed: number;
+    guided: number;
   };
 }
 
@@ -49,6 +50,15 @@ export default function StatsCards({ stats }: StatsCardsProps) {
       ringColor: "ring-green-300",
     },
     {
+      key: "guided",
+      label: "1차 안내 완료",
+      value: stats.guided,
+      icon: MailCheck,
+      iconBg: "bg-blue-50",
+      iconColor: "text-blue-700",
+      ringColor: "ring-blue-300",
+    },
+    {
       key: "completed",
       label: "제출 완료",
       value: stats.completed,
@@ -60,7 +70,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
   ];
 
   return (
-    <div className="mb-8 grid gap-4 sm:grid-cols-3">
+    <div className="mb-8 grid gap-4 sm:grid-cols-4">
       {cards.map((card) => {
         const Icon = card.icon;
         const isActive = activeFilter === card.key;
