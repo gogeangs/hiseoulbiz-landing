@@ -33,11 +33,16 @@ export async function PUT(
 
   try {
     const body = await request.json();
+
+    // 빈 문자열을 undefined로 변환 (optional 필드)
+    if (body.birthDate === "") body.birthDate = undefined;
+    if (body.district === "") body.district = undefined;
+
     const adminSchema = applicationSchema
       .omit({ privacyConsent: true })
       .extend({
-        birthDate: applicationSchema.shape.birthDate.optional().default(""),
-        district: applicationSchema.shape.district.optional().default("" as never),
+        birthDate: applicationSchema.shape.birthDate.optional(),
+        district: applicationSchema.shape.district.optional(),
       });
 
     const validated = adminSchema.safeParse(body);
