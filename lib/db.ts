@@ -210,6 +210,14 @@ export async function toggleSmsSent(id: number): Promise<{ smsSent: boolean } | 
   return { smsSent: rows[0].sms_sent_at !== null };
 }
 
+export async function resetEmailStatus(id: number): Promise<boolean> {
+  const sql = getSQL();
+  const rows = await sql`
+    UPDATE applications SET email_sent_at = NULL, email_error = NULL WHERE id = ${id} RETURNING id
+  `;
+  return rows.length > 0;
+}
+
 export async function updateMemo(id: number, memo: string): Promise<boolean> {
   const sql = getSQL();
   const rows = await sql`

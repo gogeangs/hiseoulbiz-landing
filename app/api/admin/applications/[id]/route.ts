@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminToken } from "@/lib/auth";
-import { updateApplication, deleteApplication, toggleCompleted, toggleSmsSent, checkDuplicateEmail, getApplicationsByIds, updateMemo } from "@/lib/db";
+import { updateApplication, deleteApplication, toggleCompleted, toggleSmsSent, checkDuplicateEmail, getApplicationsByIds, updateMemo, resetEmailStatus } from "@/lib/db";
 import { applicationSchema } from "@/lib/validations";
 import { buildCompletionConfirmEmail } from "@/lib/email-template";
 import { sendMail } from "@/lib/mailer";
@@ -116,6 +116,18 @@ export async function PATCH(
       const memo = (body as { memo?: string }).memo ?? "";
       const updated = await updateMemo(id, memo);
       if (!updated) {
+        return NextResponse.json(
+          { error: "해당 신청자를 찾을 수 없습니다." },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({ success: true });
+    }
+
+    // 이메일 상태 초기화
+    if (field === "email_reset") {
+      const reset = await resetEmailStatus(id);
+      if (!reset) {
         return NextResponse.json(
           { error: "해당 신청자를 찾을 수 없습니다." },
           { status: 404 }

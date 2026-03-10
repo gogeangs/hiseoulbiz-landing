@@ -76,6 +76,7 @@ export default function ApplicationTable({
 
   const [togglingId, setTogglingId] = useState<number | null>(null);
   const [togglingSmsId, setTogglingSmsId] = useState<number | null>(null);
+  const [resettingEmailId, setResettingEmailId] = useState<number | null>(null);
 
   // 페이지네이션
   const PAGE_SIZE = 20;
@@ -127,6 +128,30 @@ export default function ApplicationTable({
       alert("처리 중 오류가 발생했습니다.");
     } finally {
       setTogglingSmsId(null);
+    }
+  };
+
+  const handleResetEmail = async (id: number) => {
+    if (!confirm("이메일 발송 상태를 초기화하시겠습니까?\n미발송 상태로 변경되어 재발송할 수 있습니다.")) return;
+    setResettingEmailId(id);
+    try {
+      const res = await fetch(`/api/admin/applications/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ field: "email_reset" }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        alert(data?.error || "처리에 실패했습니다.");
+        return;
+      }
+      startTransition(() => {
+        router.refresh();
+      });
+    } catch {
+      alert("처리 중 오류가 발생했습니다.");
+    } finally {
+      setResettingEmailId(null);
     }
   };
 
@@ -735,15 +760,24 @@ export default function ApplicationTable({
                     })}
                   </td>
                   <td className="px-2 py-3 text-center">
-                    {app.email_sent_at ? (
-                      <CircleCheck className="mx-auto h-5 w-5 text-green-600" />
-                    ) : app.email_error ? (
-                      <span
-                        className="cursor-help"
-                        title={app.email_error}
+                    {resettingEmailId === app.id ? (
+                      <Loader2 className="mx-auto h-4 w-4 animate-spin text-gray-400" />
+                    ) : app.email_sent_at ? (
+                      <button
+                        onClick={() => handleResetEmail(app.id)}
+                        className="group relative"
+                        title="클릭하여 발송 상태 초기화"
                       >
-                        <X className="mx-auto h-5 w-5 text-red-500" />
-                      </span>
+                        <CircleCheck className="mx-auto h-5 w-5 text-green-600 group-hover:text-gray-400" />
+                      </button>
+                    ) : app.email_error ? (
+                      <button
+                        onClick={() => handleResetEmail(app.id)}
+                        className="group relative"
+                        title={`${app.email_error}\n클릭하여 초기화`}
+                      >
+                        <X className="mx-auto h-5 w-5 text-red-500 group-hover:text-gray-400" />
+                      </button>
                     ) : (
                       <Circle className="mx-auto h-5 w-5 text-gray-300" />
                     )}
