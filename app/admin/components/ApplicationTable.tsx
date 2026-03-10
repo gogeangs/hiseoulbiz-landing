@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Search, Download, Loader2, Mail, X, Plus, Pencil, Trash2, CircleCheck, Circle, ChevronLeft, ChevronRight, MessageSquare } from "lucide-react";
+import { Search, Download, Loader2, Mail, X, Plus, Pencil, Trash2, CircleCheck, Circle, ChevronLeft, ChevronRight, MessageSquare, UserX } from "lucide-react";
 import { SEOUL_DISTRICTS } from "@/lib/validations";
 import { BONUS_TARGETS } from "@/lib/constants";
 import type { ApplicationRow } from "@/lib/db";
@@ -77,6 +77,7 @@ export default function ApplicationTable({
   const [togglingId, setTogglingId] = useState<number | null>(null);
   const [togglingSmsId, setTogglingSmsId] = useState<number | null>(null);
   const [resettingEmailId, setResettingEmailId] = useState<number | null>(null);
+  const [rejectingId, setRejectingId] = useState<number | null>(null);
 
   // 페이지네이션
   const PAGE_SIZE = 20;
@@ -88,13 +89,20 @@ export default function ApplicationTable({
   // 클라이언트 사이드 필터링
   const filtered = applications.filter((app) => {
     // statsFilter 적용
-    if (statsFilter === "today") {
-      const appDate = new Date(app.submitted_at).toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit" });
-      if (appDate !== todayStr) return false;
+    if (statsFilter === "rejected") {
+      if (!app.rejected_at) return false;
+    } else {
+      // 탈락 카드 외의 필터에서는 탈락자 제외
+      if (app.rejected_at) return false;
+
+      if (statsFilter === "today") {
+        const appDate = new Date(app.submitted_at).toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit" });
+        if (appDate !== todayStr) return false;
+      }
+      if (statsFilter === "completed" && !app.completed_at) return false;
+      if (statsFilter === "guided" && !(app.email_sent_at && app.sms_sent_at)) return false;
+      if (statsFilter === "pending" && !(((!app.email_sent_at) || (!app.sms_sent_at)) && !app.completed_at)) return false;
     }
-    if (statsFilter === "completed" && !app.completed_at) return false;
-    if (statsFilter === "guided" && !(app.email_sent_at && app.sms_sent_at)) return false;
-    if (statsFilter === "pending" && !(((!app.email_sent_at) || (!app.sms_sent_at)) && !app.completed_at)) return false;
 
     if (sentFilter === "sent" && !app.email_sent_at) return false;
     if (sentFilter === "failed" && !app.email_error) return false;
@@ -154,6 +162,33 @@ export default function ApplicationTable({
       alert("처리 중 오류가 발생했습니다.");
     } finally {
       setResettingEmailId(null);
+    }
+  };
+
+  const handleToggleRejected = async (id: number, currentlyRejected: boolean) => {
+    const msg = currentlyRejected
+      ? "탈락 처리를 해제하시겠습니까?"
+      : "해당 신청자를 탈락 처리하시겠습니까?";
+    if (!confirm(msg)) return;
+    setRejectingId(id);
+    try {
+      const res = await fetch(`/api/admin/applications/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ field: "rejected" }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        alert(data?.error || "처리에 실패했습니다.");
+        return;
+      }
+      startTransition(() => {
+        router.refresh();
+      });
+    } catch {
+      alert("처리 중 오류가 발생했습니다.");
+    } finally {
+      setRejectingId(null);
     }
   };
 
@@ -716,7 +751,7 @@ export default function ApplicationTable({
               paged.map((app, idx) => (
                 <tr
                   key={app.id}
-                  className="transition-colors hover:bg-gray-50"
+                  className={`transition-colors ${app.rejected_at ? "bg-gray-50 opacity-60" : "hover:bg-gray-50"}`}
                 >
                   <td className="px-3 py-3 text-center">
                     <input
@@ -827,6 +862,18 @@ export default function ApplicationTable({
                   </td>
                   <td className="px-2 py-3 text-center">
                     <div className="inline-flex items-center gap-1">
+                      <button
+                        onClick={() => handleToggleRejected(app.id, !!app.rejected_at)}
+                        disabled={rejectingId === app.id}
+                        className={`rounded p-1 transition-colors ${app.rejected_at ? "text-red-500 hover:bg-red-50" : "text-gray-400 hover:bg-red-50 hover:text-red-500"}`}
+                        title={app.rejected_at ? "탈락 해제" : "탈락 처리"}
+                      >
+                        {rejectingId === app.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <UserX className="h-4 w-4" />
+                        )}
+                      </button>
                       <button
                         onClick={() => openEditModal(app)}
                         className="rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"

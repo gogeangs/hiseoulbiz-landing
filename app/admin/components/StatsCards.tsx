@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Users, CalendarPlus, ClipboardCheck, MailCheck, FileSearch } from "lucide-react";
+import { Users, CalendarPlus, ClipboardCheck, MailCheck, FileSearch, UserX } from "lucide-react";
 
 interface StatsCardsProps {
   stats: {
@@ -10,6 +10,7 @@ interface StatsCardsProps {
     completed: number;
     guided: number;
     pending: number;
+    rejected: number;
   };
 }
 
@@ -77,10 +78,19 @@ export default function StatsCards({ stats }: StatsCardsProps) {
       iconColor: "text-amber-700",
       ringColor: "ring-amber-300",
     },
+    {
+      key: "rejected",
+      label: "탈락",
+      value: stats.rejected,
+      icon: UserX,
+      iconBg: "bg-gray-100",
+      iconColor: "text-gray-500",
+      ringColor: "ring-gray-300",
+    },
   ];
 
   return (
-    <div className="mb-8 grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
+    <div className="mb-8 grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
       {cards.map((card) => {
         const Icon = card.icon;
         const isActive = activeFilter === card.key;

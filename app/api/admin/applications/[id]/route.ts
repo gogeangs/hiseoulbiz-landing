@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminToken } from "@/lib/auth";
-import { updateApplication, deleteApplication, toggleCompleted, toggleSmsSent, checkDuplicateEmail, getApplicationsByIds, updateMemo, resetEmailStatus } from "@/lib/db";
+import { updateApplication, deleteApplication, toggleCompleted, toggleSmsSent, toggleRejected, checkDuplicateEmail, getApplicationsByIds, updateMemo, resetEmailStatus } from "@/lib/db";
 import { applicationSchema } from "@/lib/validations";
 import { buildCompletionConfirmEmail } from "@/lib/email-template";
 import { sendMail } from "@/lib/mailer";
@@ -139,6 +139,18 @@ export async function PATCH(
         );
       }
       return NextResponse.json({ success: true });
+    }
+
+    // 탈락 토글
+    if (field === "rejected") {
+      const result = await toggleRejected(id);
+      if (!result) {
+        return NextResponse.json(
+          { error: "해당 신청자를 찾을 수 없습니다." },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({ success: true, rejected: result.rejected });
     }
 
     // SMS 토글

@@ -28,6 +28,7 @@ export interface ApplicationRow {
   sms_sent_at: string | null;
   sms_error: string | null;
   completed_at: string | null;
+  rejected_at: string | null;
   memo: string | null;
 }
 
@@ -210,6 +211,18 @@ export async function toggleSmsSent(id: number): Promise<{ smsSent: boolean } | 
   return { smsSent: rows[0].sms_sent_at !== null };
 }
 
+export async function toggleRejected(id: number): Promise<{ rejected: boolean } | null> {
+  const sql = getSQL();
+  const rows = await sql`
+    UPDATE applications
+    SET rejected_at = CASE WHEN rejected_at IS NULL THEN NOW() ELSE NULL END
+    WHERE id = ${id}
+    RETURNING rejected_at
+  `;
+  if (rows.length === 0) return null;
+  return { rejected: rows[0].rejected_at !== null };
+}
+
 export async function resetEmailStatus(id: number): Promise<boolean> {
   const sql = getSQL();
   const rows = await sql`
@@ -228,12 +241,13 @@ export async function updateMemo(id: number, memo: string): Promise<boolean> {
 
 export async function getApplicationStats() {
   const sql = getSQL();
-  const [totalResult, todayResult, completedResult, guidedResult, pendingResult] = await Promise.all([
-    sql`SELECT COUNT(*) as count FROM applications`,
-    sql`SELECT COUNT(*) as count FROM applications WHERE submitted_at >= (NOW() AT TIME ZONE 'Asia/Seoul')::date`,
-    sql`SELECT COUNT(*) as count FROM applications WHERE completed_at IS NOT NULL`,
-    sql`SELECT COUNT(*) as count FROM applications WHERE email_sent_at IS NOT NULL AND sms_sent_at IS NOT NULL`,
-    sql`SELECT COUNT(*) as count FROM applications WHERE (email_sent_at IS NULL OR sms_sent_at IS NULL) AND completed_at IS NULL`,
+  const [totalResult, todayResult, completedResult, guidedResult, pendingResult, rejectedResult] = await Promise.all([
+    sql`SELECT COUNT(*) as count FROM applications WHERE rejected_at IS NULL`,
+    sql`SELECT COUNT(*) as count FROM applications WHERE submitted_at >= (NOW() AT TIME ZONE 'Asia/Seoul')::date AND rejected_at IS NULL`,
+    sql`SELECT COUNT(*) as count FROM applications WHERE completed_at IS NOT NULL AND rejected_at IS NULL`,
+    sql`SELECT COUNT(*) as count FROM applications WHERE email_sent_at IS NOT NULL AND sms_sent_at IS NOT NULL AND rejected_at IS NULL`,
+    sql`SELECT COUNT(*) as count FROM applications WHERE (email_sent_at IS NULL OR sms_sent_at IS NULL) AND completed_at IS NULL AND rejected_at IS NULL`,
+    sql`SELECT COUNT(*) as count FROM applications WHERE rejected_at IS NOT NULL`,
   ]);
 
   return {
@@ -242,5 +256,6 @@ export async function getApplicationStats() {
     completed: Number(completedResult[0].count),
     guided: Number(guidedResult[0].count),
     pending: Number(pendingResult[0].count),
+    rejected: Number(rejectedResult[0].count),
   };
 }
