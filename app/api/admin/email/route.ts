@@ -1,16 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "fs/promises";
 import path from "path";
-import { Resend } from "resend";
 import { verifyAdminToken } from "@/lib/auth";
 import { getApplicationsByIds, markEmailSent, markEmailFailed } from "@/lib/db";
 import { buildApplicationGuideEmail } from "@/lib/email-template";
-
-function getResend() {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) throw new Error("RESEND_API_KEY is not configured");
-  return new Resend(apiKey);
-}
+import { sendMail } from "@/lib/mailer";
 
 // 첨부파일 모듈 레벨 캐시 (매 요청마다 디스크 I/O 방지)
 let cachedFileContent: Buffer | null = null;
@@ -52,8 +46,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const resend = getResend();
-
     // 신청서 파일 읽기 (캐시)
     const fileContent = await getAttachmentFile();
 
@@ -65,8 +57,7 @@ export async function POST(request: NextRequest) {
       const batch = applications.slice(i, i + BATCH_SIZE);
       const batchResults = await Promise.allSettled(
         batch.map(async (app) => {
-          await resend.emails.send({
-            from: process.env.RESEND_FROM_EMAIL || "하이서울기업협회 <onboarding@resend.dev>",
+          await sendMail({
             to: app.email,
             subject: `[하이서울기업협회] ${app.name}님, 신청 접수 확인 및 신청서 안내`,
             html: buildApplicationGuideEmail(app.name),
