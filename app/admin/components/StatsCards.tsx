@@ -80,7 +80,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
   ];
 
   return (
-    <div className="mb-8 grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
+    <div className="mb-8 grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
       {cards.map((card) => {
         const Icon = card.icon;
         const isActive = activeFilter === card.key;

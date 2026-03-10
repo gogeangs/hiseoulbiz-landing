@@ -153,7 +153,10 @@ export async function PATCH(
       return NextResponse.json({ success: true, smsSent: smsResult.smsSent });
     }
 
-    // 제출 완료 토글
+    // 제출 완료 토글 — 토글 전 상태 확인 (재완료 시 이메일 중복 발송 방지)
+    const beforeRows = await getApplicationsByIds([id]);
+    const wasCompleted = beforeRows.length > 0 && beforeRows[0].completed_at !== null;
+
     const result = await toggleCompleted(id);
     if (!result) {
       return NextResponse.json(
@@ -162,20 +165,17 @@ export async function PATCH(
       );
     }
 
-    // 제출 완료 체크 시 확인 이메일 발송
-    if (result.completed) {
-      const rows = await getApplicationsByIds([id]);
-      if (rows.length > 0) {
-        const app = rows[0];
-        try {
-          await sendMail({
-            to: app.email,
-            subject: `[하이서울기업협회] ${app.name}님, 서류 제출 확인 완료 안내`,
-            html: buildCompletionConfirmEmail(app.name),
-          });
-        } catch (emailError) {
-          console.error("Completion confirm email failed:", emailError);
-        }
+    // 최초 제출 완료 시에만 확인 이메일 발송 (해제 후 재완료 시 미발송)
+    if (result.completed && !wasCompleted && beforeRows.length > 0) {
+      const app = beforeRows[0];
+      try {
+        await sendMail({
+          to: app.email,
+          subject: `[하이서울기업협회] ${app.name}님, 서류 제출 확인 완료 안내`,
+          html: buildCompletionConfirmEmail(app.name),
+        });
+      } catch (emailError) {
+        console.error("Completion confirm email failed:", emailError);
       }
     }
 

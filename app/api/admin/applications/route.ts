@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     await insertApplication({
       ...validated.data,
       birthDate: validated.data.birthDate ?? "",
-      district: (validated.data.district ?? "") as "강남구",
+      district: (validated.data.district ?? "") as typeof validated.data.district & string,
       submittedAt,
     });
 
