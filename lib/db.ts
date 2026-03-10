@@ -28,6 +28,7 @@ export interface ApplicationRow {
   sms_sent_at: string | null;
   sms_error: string | null;
   completed_at: string | null;
+  memo: string | null;
 }
 
 export async function insertApplication(
@@ -207,6 +208,14 @@ export async function toggleSmsSent(id: number): Promise<{ smsSent: boolean } | 
   `;
   if (rows.length === 0) return null;
   return { smsSent: rows[0].sms_sent_at !== null };
+}
+
+export async function updateMemo(id: number, memo: string): Promise<boolean> {
+  const sql = getSQL();
+  const rows = await sql`
+    UPDATE applications SET memo = ${memo || null} WHERE id = ${id} RETURNING id
+  `;
+  return rows.length > 0;
 }
 
 export async function getApplicationStats() {

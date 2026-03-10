@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Search, Download, Loader2, Mail, X, Plus, Pencil, Trash2, CircleCheck, Circle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Download, Loader2, Mail, X, Plus, Pencil, Trash2, CircleCheck, Circle, ChevronLeft, ChevronRight, MessageSquare } from "lucide-react";
 import { SEOUL_DISTRICTS } from "@/lib/validations";
 import { BONUS_TARGETS } from "@/lib/constants";
 import type { ApplicationRow } from "@/lib/db";
@@ -67,6 +67,12 @@ export default function ApplicationTable({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // 메모
+  const [showMemoModal, setShowMemoModal] = useState(false);
+  const [memoId, setMemoId] = useState<number | null>(null);
+  const [memoText, setMemoText] = useState("");
+  const [isSavingMemo, setIsSavingMemo] = useState(false);
 
   const [togglingId, setTogglingId] = useState<number | null>(null);
   const [togglingSmsId, setTogglingSmsId] = useState<number | null>(null);
@@ -247,6 +253,37 @@ export default function ApplicationTable({
       alert("삭제 중 오류가 발생했습니다.");
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const openMemoModal = (app: ApplicationRow) => {
+    setMemoId(app.id);
+    setMemoText(app.memo || "");
+    setShowMemoModal(true);
+  };
+
+  const handleSaveMemo = async () => {
+    if (memoId === null) return;
+    setIsSavingMemo(true);
+    try {
+      const res = await fetch(`/api/admin/applications/${memoId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ field: "memo", memo: memoText }),
+      });
+      if (!res.ok) {
+        alert("메모 저장에 실패했습니다.");
+        return;
+      }
+      setShowMemoModal(false);
+      setMemoId(null);
+      startTransition(() => {
+        router.refresh();
+      });
+    } catch {
+      alert("메모 저장 중 오류가 발생했습니다.");
+    } finally {
+      setIsSavingMemo(false);
     }
   };
 
@@ -632,6 +669,7 @@ export default function ApplicationTable({
               <th className="w-16 px-2 py-3 text-center font-medium text-gray-500">메일</th>
               <th className="w-12 px-2 py-3 text-center font-medium text-gray-500">문자</th>
               <th className="w-12 px-2 py-3 text-center font-medium text-gray-500">제출</th>
+              <th className="w-12 px-2 py-3 text-center font-medium text-gray-500">메모</th>
               <th className="w-16 px-2 py-3 text-center font-medium text-gray-500">관리</th>
             </tr>
           </thead>
@@ -639,7 +677,7 @@ export default function ApplicationTable({
             {paged.length === 0 ? (
               <tr>
                 <td
-                  colSpan={13}
+                  colSpan={14}
                   className="px-2 py-12 text-center text-gray-400"
                 >
                   {hasActiveFilter
@@ -740,6 +778,15 @@ export default function ApplicationTable({
                       ) : (
                         <Circle className="h-5 w-5 text-gray-300 hover:text-gray-400" />
                       )}
+                    </button>
+                  </td>
+                  <td className="px-2 py-3 text-center">
+                    <button
+                      onClick={() => openMemoModal(app)}
+                      className={`rounded p-1 transition-colors hover:bg-gray-100 ${app.memo ? "text-amber-500" : "text-gray-300 hover:text-gray-400"}`}
+                      title={app.memo || "메모 추가"}
+                    >
+                      <MessageSquare className="h-4 w-4" />
                     </button>
                   </td>
                   <td className="px-2 py-3 text-center">
@@ -904,6 +951,37 @@ export default function ApplicationTable({
               >
                 {isDeleting && <Loader2 className="h-4 w-4 animate-spin" />}
                 삭제
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 메모 모달 */}
+      {showMemoModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="mx-4 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-bold text-gray-900">메모</h3>
+            <textarea
+              value={memoText}
+              onChange={(e) => setMemoText(e.target.value)}
+              placeholder="이슈사항, 히스토리 등을 기록하세요..."
+              className="mt-3 h-32 w-full resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+            />
+            <div className="mt-4 flex justify-end gap-3">
+              <button
+                onClick={() => { setShowMemoModal(false); setMemoId(null); }}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleSaveMemo}
+                disabled={isSavingMemo}
+                className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2 text-sm text-white hover:bg-primary-700 disabled:opacity-50"
+              >
+                {isSavingMemo && <Loader2 className="h-4 w-4 animate-spin" />}
+                저장
               </button>
             </div>
           </div>
