@@ -94,6 +94,7 @@ export default function ApplicationTable({
     }
     if (statsFilter === "completed" && !app.completed_at) return false;
     if (statsFilter === "guided" && !(app.email_sent_at && app.sms_sent_at)) return false;
+    if (statsFilter === "pending" && !(((!app.email_sent_at) || (!app.sms_sent_at)) && !app.completed_at)) return false;
 
     if (sentFilter === "sent" && !app.email_sent_at) return false;
     if (sentFilter === "failed" && !app.email_error) return false;
