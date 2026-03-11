@@ -41,6 +41,7 @@ export async function PUT(
     const adminSchema = applicationSchema
       .omit({ privacyConsent: true })
       .extend({
+        name: applicationSchema.shape.name.min(1, "이름을 입력해 주세요."),
         birthDate: applicationSchema.shape.birthDate.optional(),
         district: applicationSchema.shape.district.optional(),
       });
