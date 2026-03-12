@@ -89,6 +89,10 @@ export function buildApplicationGuideEmail(applicantName: string): string {
             <td style="padding:8px 0;border-bottom:1px solid #f1f5f9;">${PROGRAM.location}</td>
           </tr>
           <tr>
+            <td style="padding:8px 0;border-bottom:1px solid #f1f5f9;font-weight:600;">서류 마감</td>
+            <td style="padding:8px 0;border-bottom:1px solid #f1f5f9;color:#dc2626;font-weight:600;">${PROGRAM.deadline}</td>
+          </tr>
+          <tr>
             <td style="padding:8px 0;font-weight:600;">면접 일정</td>
             <td style="padding:8px 0;">${PROGRAM.interviewDate} (개별 안내)</td>
           </tr>
