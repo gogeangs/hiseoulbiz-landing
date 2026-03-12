@@ -36,8 +36,10 @@ export async function insertApplication(
   data: Omit<ApplicationFormData, "privacyConsent"> & { submittedAt: string }
 ): Promise<number> {
   const sql = getSQL();
-  const { name, phone, email, birthDate, district, bonusTargets, submittedAt } =
+  const { name, phone, email, birthDate: rawBirthDate, district: rawDistrict, bonusTargets, submittedAt } =
     data;
+  const birthDate = rawBirthDate || null;
+  const district = rawDistrict || null;
   // JSON으로 변환 후 Postgres에서 파싱 — SQL 인젝션 방지
   const targets =
     bonusTargets && bonusTargets.length > 0
