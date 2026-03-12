@@ -41,8 +41,10 @@ export async function POST(request: NextRequest) {
     // 서버 사이드 유효성 검증
     const validated = applicationSchema.safeParse(body);
     if (!validated.success) {
+      const fieldErrors = validated.error.flatten().fieldErrors;
+      const firstError = Object.values(fieldErrors).flat()[0];
       return NextResponse.json(
-        { error: "입력 정보를 확인해 주세요.", details: validated.error.flatten() },
+        { error: firstError || "입력 정보를 확인해 주세요.", details: validated.error.flatten() },
         { status: 400 }
       );
     }
@@ -85,7 +87,7 @@ export async function POST(request: NextRequest) {
           { status: 409 }
         );
       }
-      console.error("DB insert failed:", dbResult.reason);
+      console.error("DB insert failed:", dbResult.reason, "formData:", JSON.stringify(formData));
       return NextResponse.json(
         { error: "제출에 실패했습니다. 잠시 후 다시 시도해 주세요." },
         { status: 500 }
