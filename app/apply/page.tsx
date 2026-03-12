@@ -172,7 +172,7 @@ export default function ApplyPage() {
               {/* 생년월일 */}
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                  생년월일 <span className="text-red-500">*</span>
+                  생년월일
                 </label>
                 <input
                   {...register("birthDate")}
@@ -189,7 +189,7 @@ export default function ApplyPage() {
               {/* 거주 지역 */}
               <div className="md:col-span-2">
                 <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                  서울시 거주 지역 <span className="text-red-500">*</span>
+                  서울시 거주 지역
                 </label>
                 <select
                   {...register("district")}

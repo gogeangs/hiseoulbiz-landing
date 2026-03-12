@@ -1,0 +1,158 @@
+"use client";
+
+import { useState } from "react";
+import { isApplicationOpen } from "@/lib/utils";
+import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { trackLead } from "@/lib/fbq";
+import Link from "next/link";
+
+export default function InlineApplyForm() {
+  const open = isApplicationOpen();
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [privacyConsent, setPrivacyConsent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  if (!open) return null;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, phone, email, privacyConsent }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json();
+        throw new Error(body.error || "제출에 실패했습니다.");
+      }
+
+      trackLead();
+      setSuccess(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "제출에 실패했습니다.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <section id="apply" className="bg-primary-50 py-16 md:py-20">
+        <div className="mx-auto max-w-2xl px-4 text-center">
+          <CheckCircle2 className="mx-auto mb-4 h-16 w-16 text-green-500" />
+          <h2 className="mb-2 text-2xl font-bold text-primary-900">신청이 완료되었습니다!</h2>
+          <p className="text-gray-600">
+            입력하신 이메일로 신청서 작성 안내를 보내드렸습니다.<br />
+            메일함을 확인해 주세요.
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section id="apply" className="bg-primary-50 py-16 md:py-20">
+      <div className="mx-auto max-w-2xl px-4">
+        <div className="mb-8 text-center">
+          <h2 className="mb-2 text-2xl font-bold text-primary-900 md:text-3xl">
+            간편 신청
+          </h2>
+          <p className="text-gray-600">
+            3가지 정보만 입력하면 바로 신청 완료!
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="rounded-2xl border border-primary-100 bg-white p-6 shadow-sm md:p-8">
+          <div className="grid gap-4 md:grid-cols-3">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                이름 <span className="text-red-500">*</span>
+              </label>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="홍길동"
+                required
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                연락처 <span className="text-red-500">*</span>
+              </label>
+              <input
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="010-1234-5678"
+                inputMode="tel"
+                required
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                이메일 <span className="text-red-500">*</span>
+              </label>
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                placeholder="example@email.com"
+                required
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+              />
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                checked={privacyConsent}
+                onChange={(e) => setPrivacyConsent(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              />
+              <span className="text-sm text-gray-600">
+                개인정보(이름, 연락처, 이메일) 수집·이용에 동의합니다.{" "}
+                <Link href="/privacy" target="_blank" className="text-primary-700 underline underline-offset-2">
+                  개인정보처리방침
+                </Link>
+              </span>
+            </label>
+          </div>
+
+          {error && (
+            <div className="mt-4 flex items-center gap-2 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={submitting || !privacyConsent}
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-primary-700 py-4 text-lg font-bold text-white transition-colors hover:bg-primary-800 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
+          >
+            {submitting ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                제출 중...
+              </>
+            ) : (
+              "지금 바로 신청하기"
+            )}
+          </button>
+        </form>
+      </div>
+    </section>
+  );
+}

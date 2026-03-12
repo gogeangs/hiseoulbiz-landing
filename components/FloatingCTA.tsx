@@ -32,7 +32,7 @@ export default function FloatingCTA() {
       }`}
     >
       <Link
-        href={APPLY_URL}
+        href="#apply"
         className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary-700 py-4 text-lg font-bold text-white shadow-2xl transition-colors hover:bg-primary-800"
       >
         신청하기

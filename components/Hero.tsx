@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { PROGRAM } from "@/lib/constants";
@@ -8,6 +9,14 @@ import { ArrowRight, Users, CalendarClock } from "lucide-react";
 
 export default function Hero() {
   const open = isApplicationOpen();
+  const [applicantCount, setApplicantCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch("/api/stats/count")
+      .then((res) => res.json())
+      .then((data) => setApplicantCount(data.count))
+      .catch(() => {});
+  }, []);
 
   return (
     <section className="relative overflow-hidden bg-primary-900 py-24 text-white md:py-36">
@@ -36,26 +45,26 @@ export default function Hero() {
           <span>{PROGRAM.project}</span>
         </div>
 
-        <h1 className="mb-8 text-4xl font-bold leading-tight md:text-6xl lg:text-7xl md:leading-tight">
-          글로벌 이커머스 &<br />
-          세일즈 기획 실무 과정
+        <h1 className="mb-6 text-4xl font-bold leading-tight md:text-6xl lg:text-7xl md:leading-tight">
+          교육비 무료, 수당까지<br />
+          이커머스 실무 과정
         </h1>
 
-        <p className="mx-auto mb-10 max-w-2xl text-xl text-white/80 md:text-2xl">
-          현직자에게 배우는 350시간 실무 교육,
+        <p className="mx-auto mb-8 max-w-2xl text-xl text-white/80 md:text-2xl">
+          350시간 현직자 실무 교육 + 일 2.5만원 수당
           <br className="hidden sm:block" />
-          수료 후 유급 인턴십까지 한 번에
+          수료 후 월 253만원 유급 인턴십 연계
         </p>
 
-        <div className="mb-12 flex flex-wrap justify-center gap-3 md:gap-4">
+        <div className="mb-10 flex flex-wrap justify-center gap-3 md:gap-4">
           <span className="rounded-full bg-accent px-5 py-2.5 text-base font-semibold text-primary-950 md:text-lg">
-            교육비 무료
+            교육비 전액 무료
           </span>
           <span className="rounded-full bg-white/15 px-5 py-2.5 text-base font-semibold backdrop-blur-sm md:text-lg">
-            교육 수당 지급
+            일 25,000원 수당
           </span>
           <span className="rounded-full bg-white/15 px-5 py-2.5 text-base font-semibold backdrop-blur-sm md:text-lg">
-            유급 인턴 연계
+            3개월 유급 인턴
           </span>
         </div>
 
@@ -82,6 +91,11 @@ export default function Hero() {
             <Users className="h-5 w-5" />
             선발 인원: {PROGRAM.capacity}명
           </span>
+          {applicantCount !== null && applicantCount > 0 && (
+            <span className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 font-medium text-accent backdrop-blur-sm">
+              현재 {applicantCount}명 신청 완료
+            </span>
+          )}
         </div>
       </div>
     </section>

@@ -36,9 +36,13 @@ export const applicationSchema = z.object({
       const [y, m, d] = val.split("-").map(Number);
       const date = new Date(y, m - 1, d);
       return date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d;
-    }, "존재하지 않는 날짜입니다."),
+    }, "존재하지 않는 날짜입니다.")
+    .optional()
+    .or(z.literal("")),
   district: z
-    .enum(SEOUL_DISTRICTS, { message: "거주 지역을 선택해 주세요." }),
+    .enum(SEOUL_DISTRICTS, { message: "거주 지역을 선택해 주세요." })
+    .optional()
+    .or(z.literal("")),
   bonusTargets: z
     .array(z.enum(BONUS_TARGETS_ENUM))
     .optional(),

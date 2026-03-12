@@ -11,6 +11,7 @@ import FAQ from "@/components/FAQ";
 import PointBanner from "@/components/PointBanner";
 import Contact from "@/components/Contact";
 import FloatingCTA from "@/components/FloatingCTA";
+import InlineApplyForm from "@/components/InlineApplyForm";
 
 export default function Home() {
   return (
@@ -27,6 +28,7 @@ export default function Home() {
         <Eligibility />
         <Timeline />
         <FAQ />
+        <InlineApplyForm />
       </main>
       <Contact />
       <FloatingCTA />
