@@ -55,9 +55,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Manual application insert error:", error);
+    const errMsg = error instanceof Error ? error.message : String(error);
+    console.error("Manual application insert error:", errMsg, error);
     return NextResponse.json(
-      { error: "등록에 실패했습니다." },
+      { error: `등록에 실패했습니다: ${errMsg}` },
       { status: 500 }
     );
   }
