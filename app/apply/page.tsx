@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -18,6 +18,16 @@ export default function ApplyPage() {
   const open = isApplicationOpen();
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const utmRef = useRef({ utm_source: "", utm_medium: "", utm_campaign: "" });
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    utmRef.current = {
+      utm_source: params.get("utm_source") || "",
+      utm_medium: params.get("utm_medium") || "",
+      utm_campaign: params.get("utm_campaign") || "",
+    };
+  }, []);
 
   const {
     register,
@@ -44,7 +54,7 @@ export default function ApplyPage() {
       const res = await fetch("/api/apply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, ...utmRef.current }),
       });
 
       if (!res.ok) {
