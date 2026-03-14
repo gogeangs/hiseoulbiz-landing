@@ -1,9 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { PROGRAM } from "@/lib/constants";
-import { APPLY_URL, isApplicationOpen } from "@/lib/utils";
+import { isApplicationOpen } from "@/lib/utils";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import {
   BadgeCheck,
@@ -105,13 +104,13 @@ export default function InternshipInfo() {
 
         <div className="mt-12 text-center">
           {open ? (
-            <Link
-              href={APPLY_URL}
+            <a
+              href="#apply"
               className="inline-flex items-center gap-2 rounded-xl bg-accent px-8 py-4 text-lg font-bold text-primary-950 transition-colors hover:bg-yellow-400"
             >
               지금 신청하기
               <ArrowRight className="h-5 w-5" />
-            </Link>
+            </a>
           ) : (
             <span className="inline-flex items-center gap-2 rounded-xl bg-gray-500 px-8 py-4 text-lg font-bold text-gray-300">
               모집이 마감되었습니다

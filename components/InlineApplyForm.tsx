@@ -86,7 +86,7 @@ export default function InlineApplyForm() {
               <Clock className="h-4 w-4" />
               마감까지 <strong>D-{days}일</strong>
             </span>
-            <span className="text-current/50">|</span>
+            <span className="opacity-40">|</span>
             <span className="flex items-center gap-1.5">
               <Users className="h-4 w-4" />
               모집 인원 <strong>{PROGRAM.capacity}명</strong>

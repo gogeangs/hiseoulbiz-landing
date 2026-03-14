@@ -30,7 +30,7 @@ export default function Outcomes() {
   const { ref, visible } = useScrollReveal(0.1);
 
   return (
-    <section className="bg-white py-16 md:py-20" ref={ref}>
+    <section className="bg-gray-50 py-16 md:py-20" ref={ref}>
       <div className="mx-auto max-w-6xl px-4">
         <h2
           className={`mb-4 text-center text-2xl font-bold text-primary-900 md:text-3xl transition-all duration-700 ${

@@ -12,7 +12,14 @@ export default function FloatingCTA() {
     const onScroll = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
-          setVisible(window.scrollY > 600);
+          const applyEl = document.getElementById("apply");
+          if (applyEl) {
+            const rect = applyEl.getBoundingClientRect();
+            const formVisible = rect.top < window.innerHeight && rect.bottom > 0;
+            setVisible(window.scrollY > 600 && !formVisible);
+          } else {
+            setVisible(window.scrollY > 600);
+          }
           ticking = false;
         });
         ticking = true;
