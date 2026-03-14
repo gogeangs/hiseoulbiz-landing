@@ -62,8 +62,13 @@ export async function POST(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { privacyConsent: _consent, ...formData } = validated.data;
 
+    // UTM 파라미터 (유효성 검증 스키마 외 별도 처리)
+    const utmSource = typeof body.utm_source === "string" ? body.utm_source.slice(0, 100) : "";
+    const utmMedium = typeof body.utm_medium === "string" ? body.utm_medium.slice(0, 100) : "";
+    const utmCampaign = typeof body.utm_campaign === "string" ? body.utm_campaign.slice(0, 200) : "";
+
     // Dual write: DB + GAS (병렬 처리)
-    const dbPromise = insertApplication({ ...formData, submittedAt });
+    const dbPromise = insertApplication({ ...formData, submittedAt, utmSource, utmMedium, utmCampaign });
 
     const gasUrl = process.env.GAS_WEBHOOK_URL;
     const gasPromise = gasUrl

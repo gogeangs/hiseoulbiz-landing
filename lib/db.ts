@@ -30,13 +30,16 @@ export interface ApplicationRow {
   completed_at: string | null;
   rejected_at: string | null;
   memo: string | null;
+  utm_source: string;
+  utm_medium: string;
+  utm_campaign: string;
 }
 
 export async function insertApplication(
-  data: Omit<ApplicationFormData, "privacyConsent"> & { submittedAt: string }
+  data: Omit<ApplicationFormData, "privacyConsent"> & { submittedAt: string; utmSource?: string; utmMedium?: string; utmCampaign?: string }
 ): Promise<number> {
   const sql = getSQL();
-  const { name, phone, email, birthDate: rawBirthDate, district: rawDistrict, bonusTargets, submittedAt } =
+  const { name, phone, email, birthDate: rawBirthDate, district: rawDistrict, bonusTargets, submittedAt, utmSource, utmMedium, utmCampaign } =
     data;
   const birthDate = rawBirthDate || "";
   const district = rawDistrict || "";
@@ -47,13 +50,13 @@ export async function insertApplication(
       : null;
   try {
     const rows = await sql`
-      INSERT INTO applications (name, phone, email, birth_date, district, bonus_targets, submitted_at)
+      INSERT INTO applications (name, phone, email, birth_date, district, bonus_targets, submitted_at, utm_source, utm_medium, utm_campaign)
       VALUES (${name}, ${phone}, ${email}, ${birthDate}, ${district},
         CASE WHEN ${targets}::text IS NOT NULL
           THEN ARRAY(SELECT jsonb_array_elements_text(${targets}::jsonb))
           ELSE NULL
         END,
-        ${submittedAt})
+        ${submittedAt}, ${utmSource || ""}, ${utmMedium || ""}, ${utmCampaign || ""})
       RETURNING id
     `;
     return rows[0].id as number;

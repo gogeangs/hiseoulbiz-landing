@@ -454,6 +454,7 @@ export default function ApplicationTable({
       "거주지역",
       "가점대상",
       "신청일시",
+      "유입경로",
       "이메일발송",
       "문자발송",
       "제출완료",
@@ -467,6 +468,7 @@ export default function ApplicationTable({
       app.district,
       app.bonus_targets?.join(", ") ?? "",
       new Date(app.submitted_at).toLocaleString("ko-KR"),
+      app.utm_source || "직접",
       app.email_sent_at
         ? new Date(app.email_sent_at).toLocaleString("ko-KR")
         : "미발송",
@@ -727,6 +729,7 @@ export default function ApplicationTable({
               <th className="px-2 py-3 font-medium text-gray-500">생년월일</th>
               <th className="w-16 px-2 py-3 font-medium text-gray-500">지역</th>
               <th className="px-2 py-3 font-medium text-gray-500">가점대상</th>
+              <th className="px-2 py-3 font-medium text-gray-500">유입경로</th>
               <th className="px-2 py-3 font-medium text-gray-500">신청일시</th>
               <th className="w-16 px-2 py-3 text-center font-medium text-gray-500">메일</th>
               <th className="w-12 px-2 py-3 text-center font-medium text-gray-500">문자</th>
@@ -739,7 +742,7 @@ export default function ApplicationTable({
             {paged.length === 0 ? (
               <tr>
                 <td
-                  colSpan={14}
+                  colSpan={15}
                   className="px-2 py-12 text-center text-gray-400"
                 >
                   {hasActiveFilter
@@ -785,6 +788,15 @@ export default function ApplicationTable({
                       </div>
                     ) : (
                       <span className="text-gray-300">-</span>
+                    )}
+                  </td>
+                  <td className="px-2 py-3">
+                    {app.utm_source ? (
+                      <span className="inline-block rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-700">
+                        {app.utm_source}
+                      </span>
+                    ) : (
+                      <span className="text-gray-300">직접</span>
                     )}
                   </td>
                   <td className="whitespace-nowrap px-2 py-3 text-gray-500">

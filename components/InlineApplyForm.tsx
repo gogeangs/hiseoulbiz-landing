@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { isApplicationOpen } from "@/lib/utils";
 import { useCountdown } from "@/hooks/useCountdown";
 import { DEADLINE_ISO, PROGRAM } from "@/lib/constants";
@@ -19,6 +19,16 @@ export default function InlineApplyForm() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [touched, setTouched] = useState({ name: false, phone: false, email: false });
+  const utmRef = useRef({ utm_source: "", utm_medium: "", utm_campaign: "" });
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    utmRef.current = {
+      utm_source: params.get("utm_source") || "",
+      utm_medium: params.get("utm_medium") || "",
+      utm_campaign: params.get("utm_campaign") || "",
+    };
+  }, []);
 
   if (!open) return null;
 
@@ -43,7 +53,7 @@ export default function InlineApplyForm() {
       const res = await fetch("/api/apply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, email, privacyConsent }),
+        body: JSON.stringify({ name, phone, email, privacyConsent, ...utmRef.current }),
       });
 
       if (!res.ok) {
