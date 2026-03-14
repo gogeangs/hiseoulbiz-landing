@@ -1,9 +1,21 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ELIGIBILITY, BONUS_TARGETS } from "@/lib/constants";
+import { BONUS_TARGETS } from "@/lib/constants";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
-import { CheckCircle2, ChevronDown, Star } from "lucide-react";
+import { CheckCircle2, AlertCircle, ChevronDown, Star } from "lucide-react";
+
+const RECOMMENDATIONS = [
+  "글로벌 이커머스·세일즈 분야 취업을 준비 중인 분",
+  "실무 프로젝트와 포트폴리오가 필요한 분",
+  "평일 전일제 교육 참여가 가능한 분",
+];
+
+const REQUIREMENTS = [
+  "만 18세 이상 ~ 만 39세 이하",
+  "서울시 거주 구직자 (졸업 예정자 가능, 재학생 불가)",
+  "전 과정 개인 노트북 지참 필요",
+];
 
 export default function Eligibility() {
   const [bonusOpen, setBonusOpen] = useState(false);
@@ -26,21 +38,49 @@ export default function Eligibility() {
           지원 자격
         </h2>
         <p className={`mb-12 text-center text-gray-500 transition-all duration-700 delay-100 ${visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
-          아래 조건을 모두 충족하는 분이 지원 가능합니다
+          나에게 맞는 과정인지 확인해 보세요
         </p>
 
-        <div className="mx-auto max-w-2xl space-y-4">
-          {ELIGIBILITY.map((item, idx) => (
-            <div
-              key={item}
-              className={`flex items-start gap-3 rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-700 ${visible ? "translate-x-0 opacity-100" : "-translate-x-8 opacity-0"}`}
-              style={{ transitionDelay: `${200 + idx * 120}ms` }}
-            >
-              <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-green-500" aria-hidden="true" />
-              <p className="text-gray-700">{item}</p>
-            </div>
-          ))}
+        <div className="mx-auto max-w-4xl grid gap-6 md:grid-cols-2">
+          {/* 추천 대상 */}
+          <div
+            className={`rounded-2xl border border-green-100 bg-green-50/50 p-6 transition-all duration-700 delay-200 ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
+          >
+            <h3 className="mb-5 flex items-center gap-2 text-lg font-bold text-green-700">
+              <CheckCircle2 className="h-5 w-5" />
+              이런 분께 추천합니다
+            </h3>
+            <ul className="space-y-3">
+              {RECOMMENDATIONS.map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
+                  <p className="break-keep text-gray-700">{item}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
 
+          {/* 확인 사항 */}
+          <div
+            className={`rounded-2xl border border-amber-100 bg-amber-50/50 p-6 transition-all duration-700 delay-300 ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
+          >
+            <h3 className="mb-5 flex items-center gap-2 text-lg font-bold text-amber-700">
+              <AlertCircle className="h-5 w-5" />
+              지원 전 꼭 확인하세요
+            </h3>
+            <ul className="space-y-3">
+              {REQUIREMENTS.map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                  <p className="break-keep text-gray-700">{item}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* 가점 대상 아코디언 */}
+        <div className="mx-auto mt-6 max-w-4xl">
           <button
             onClick={() => setBonusOpen(!bonusOpen)}
             aria-expanded={bonusOpen}
@@ -69,7 +109,7 @@ export default function Eligibility() {
               opacity: bonusOpen ? 1 : 0,
             }}
           >
-            <div ref={bonusRef} className="rounded-xl border border-primary-100 bg-primary-50/50 p-5">
+            <div ref={bonusRef} className="mt-2 rounded-xl border border-primary-100 bg-primary-50/50 p-5">
               <p className="mb-3 text-sm font-medium text-primary-800">
                 아래 해당자는 선발 시 가점이 부여됩니다.
               </p>
