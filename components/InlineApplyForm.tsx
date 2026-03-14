@@ -89,7 +89,7 @@ export default function InlineApplyForm() {
             <span className="text-current/50">|</span>
             <span className="flex items-center gap-1.5">
               <Users className="h-4 w-4" />
-              선착순 <strong>{PROGRAM.capacity}명</strong>
+              모집 인원 <strong>{PROGRAM.capacity}명</strong>
             </span>
           </div>
         )}
