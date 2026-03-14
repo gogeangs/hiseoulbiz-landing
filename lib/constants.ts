@@ -109,12 +109,11 @@ export const BONUS_TARGETS = [
 ];
 
 export const TIMELINE_STEPS = [
-  { label: "신청 접수", date: "~ 3월 31일(화) 23:59", status: "active" as const },
-  { label: "선발 면접", date: "4월 2일(목)", status: "upcoming" as const },
-  { label: "결과 발표", date: "4월 9일(목)", detail: "개별 통보 (이메일/문자)", status: "upcoming" as const },
-  { label: "교육 시작", date: "4월 13일(월)", status: "upcoming" as const },
-  { label: "교육 종료", date: "6월 24일(수)", status: "upcoming" as const },
-  { label: "인턴 시작", date: "7월~", detail: "우수 수료자 대상", status: "upcoming" as const },
+  { label: "신청 마감", dateShort: "3/31", date: "3월 31일(화)", detail: "23:59까지", status: "active" as const },
+  { label: "선발 면접", dateShort: "4/2", date: "4월 2일(목)", status: "upcoming" as const },
+  { label: "결과 발표", dateShort: "4/9", date: "4월 9일(목)", detail: "개별 통보", status: "upcoming" as const },
+  { label: "교육 시작", dateShort: "4/13", date: "4월 13일(월)", detail: "총 350시간", status: "upcoming" as const },
+  { label: "유급 인턴", dateShort: "7월~", date: "7월~10월", detail: "우수 수료자 대상", status: "upcoming" as const },
 ];
 
 export const FAQ_ITEMS = [

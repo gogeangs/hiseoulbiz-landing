@@ -13,51 +13,92 @@ export default function Timeline() {
           선발 일정
         </h2>
         <p className={`mb-12 text-center text-gray-500 transition-all duration-700 delay-100 ${visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
-          신청부터 인턴 시작까지의 전체 일정
+          신청부터 인턴 시작까지 한눈에
         </p>
 
-        {/* 가로 스크롤 타임라인 + 스크롤 힌트 */}
-        <div className="relative md:static">
-          <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-8 bg-gradient-to-l from-gray-50 to-transparent md:hidden" />
-          <div className="-mx-4 overflow-x-auto px-4 pb-4 md:mx-0 md:overflow-visible md:px-0 md:pb-0">
-            <div className="relative flex min-w-max gap-0 md:min-w-0 md:grid md:grid-cols-6">
-              {/* 연결선 */}
-              <div className="pointer-events-none absolute left-8 right-8 top-5 hidden h-0.5 bg-primary-200 md:block" />
+        {/* 데스크톱: 가로 타임라인 */}
+        <div className="hidden md:block">
+          <div className="relative mx-auto max-w-4xl">
+            {/* 연결선 */}
+            <div className="absolute left-[10%] right-[10%] top-8 h-0.5 bg-primary-200" />
 
+            <div className="grid grid-cols-5">
               {TIMELINE_STEPS.map((step, idx) => (
                 <div
                   key={step.label}
-                  className={`relative flex w-40 shrink-0 flex-col items-center text-center md:w-auto transition-all duration-700 ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
+                  className={`relative flex flex-col items-center text-center transition-all duration-700 ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
                   style={{ transitionDelay: `${200 + idx * 150}ms` }}
                 >
-                  {/* 원형 순번 */}
+                  {/* 날짜 원형 */}
                   <div
-                    className={`relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 ${
+                    className={`relative z-10 flex h-16 w-16 items-center justify-center rounded-full border-2 ${
                       step.status === "active"
-                        ? "border-primary-600 bg-primary-600 text-white"
-                        : "border-primary-300 bg-white text-primary-400"
+                        ? "border-accent bg-accent text-primary-950 shadow-lg shadow-accent/30"
+                        : "border-primary-200 bg-white text-primary-700"
                     }`}
                   >
-                    <span className="text-sm font-bold">{idx + 1}</span>
+                    <span className="text-lg font-bold leading-tight">{step.dateShort}</span>
+                    {step.status === "active" && (
+                      <span className="absolute inset-0 animate-ping rounded-full bg-accent/20" />
+                    )}
                   </div>
-
-                  {/* 모바일 연결선 */}
-                  {idx < TIMELINE_STEPS.length - 1 && (
-                    <div className="absolute left-[calc(50%+20px)] top-5 h-0.5 w-[calc(100%-40px)] bg-primary-200 md:hidden" />
-                  )}
 
                   {/* 내용 */}
                   <div className="mt-4">
-                    <p className="break-keep text-sm font-bold text-primary-900">
+                    <p className={`text-sm font-bold ${step.status === "active" ? "text-accent-dark" : "text-primary-900"}`}>
                       {step.label}
                     </p>
-                    <p className="mt-1 whitespace-nowrap text-xs text-gray-500">
+                    <p className="mt-0.5 text-xs text-gray-500">
                       {step.date}
                     </p>
                     {step.detail && (
                       <p className="mt-0.5 break-keep text-xs text-gray-400">
                         {step.detail}
                       </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* 모바일: 세로 타임라인 */}
+        <div className="md:hidden">
+          <div className="relative mx-auto max-w-sm pl-10">
+            {/* 세로 연결선 */}
+            <div className="absolute left-[19px] top-2 bottom-2 w-0.5 bg-primary-200" />
+
+            <div className="space-y-6">
+              {TIMELINE_STEPS.map((step, idx) => (
+                <div
+                  key={step.label}
+                  className={`relative flex items-start gap-4 transition-all duration-700 ${visible ? "translate-x-0 opacity-100" : "-translate-x-6 opacity-0"}`}
+                  style={{ transitionDelay: `${200 + idx * 120}ms` }}
+                >
+                  {/* 원형 노드 */}
+                  <div
+                    className={`absolute -left-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 ${
+                      step.status === "active"
+                        ? "border-accent bg-accent text-primary-950 shadow-md shadow-accent/30"
+                        : "border-primary-200 bg-white text-primary-600"
+                    }`}
+                  >
+                    <span className="text-xs font-bold">{step.dateShort}</span>
+                  </div>
+
+                  {/* 내용 카드 */}
+                  <div className={`rounded-xl border p-4 ${
+                    step.status === "active"
+                      ? "border-accent/30 bg-accent/5"
+                      : "border-gray-100 bg-white"
+                  }`}>
+                    <p className={`font-bold ${step.status === "active" ? "text-accent-dark" : "text-primary-900"}`}>
+                      {step.label}
+                    </p>
+                    <p className="mt-0.5 text-sm text-gray-500">{step.date}</p>
+                    {step.detail && (
+                      <p className="mt-0.5 break-keep text-xs text-gray-400">{step.detail}</p>
                     )}
                   </div>
                 </div>
