@@ -6,9 +6,10 @@ import { isApplicationOpen } from "@/lib/utils";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import {
   BadgeCheck,
-  FileText,
-  FolderOpen,
-  HeadphonesIcon,
+  Building2,
+  Laptop,
+  FileCheck,
+  TrendingUp,
   ArrowRight,
 } from "lucide-react";
 
@@ -31,25 +32,32 @@ export default function InternshipInfo() {
           수료 후 바로 이어지는 유급 인턴십
         </h2>
         <p className={`mb-12 text-center text-white/70 transition-all duration-700 delay-100 ${visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
-          80% 이상 출석한 우수 수료자 대상
+          스펙이 아닌 진짜 경력이 되는 3개월
         </p>
 
-        <div className="mb-12 grid gap-6 md:grid-cols-3">
+        <div className="mb-12 grid gap-6 md:grid-cols-4">
           <div className={`rounded-2xl bg-white/10 p-6 text-center backdrop-blur-sm transition-all duration-700 delay-200 ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
+            <p className="mb-1 text-sm text-white/70">선발 기준</p>
+            <p className="break-keep text-xl font-bold md:text-2xl">
+              80% 이상 출석
+            </p>
+            <p className="mt-1 text-sm text-white/70">우수 수료자 대상</p>
+          </div>
+          <div className={`rounded-2xl bg-white/10 p-6 text-center backdrop-blur-sm transition-all duration-700 delay-300 ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
             <p className="mb-1 text-sm text-white/70">인턴 기간</p>
             <p className="whitespace-nowrap text-xl font-bold md:text-2xl">
               {PROGRAM.internStart} ~ {PROGRAM.internEnd}
             </p>
             <p className="mt-1 text-sm text-white/70">{PROGRAM.internMonths}개월</p>
           </div>
-          <div className={`rounded-2xl bg-white/10 p-6 text-center backdrop-blur-sm transition-all duration-700 delay-300 ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
+          <div className={`rounded-2xl bg-white/10 p-6 text-center backdrop-blur-sm transition-all duration-700 delay-[400ms] ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
             <p className="mb-1 text-sm text-white/70">월 급여 (세전)</p>
             <p className="whitespace-nowrap text-2xl font-bold md:text-3xl">
               {PROGRAM.internSalary}<span className="text-lg">원</span>
             </p>
             <p className="mt-1 text-sm text-white/70">× {PROGRAM.internMonths}개월</p>
           </div>
-          <div className={`rounded-2xl bg-white/10 p-6 text-center backdrop-blur-sm transition-all duration-700 delay-[400ms] ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
+          <div className={`rounded-2xl bg-white/10 p-6 text-center backdrop-blur-sm transition-all duration-700 delay-500 ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
             <p className="mb-1 text-sm text-white/70">추가 수당</p>
             <p className="break-keep text-xl font-bold md:text-2xl">
               연차휴가 미사용
@@ -58,45 +66,45 @@ export default function InternshipInfo() {
           </div>
         </div>
 
-        <div className={`mx-auto max-w-3xl rounded-2xl border border-accent/30 bg-accent/10 p-8 backdrop-blur-sm transition-all duration-700 delay-500 ${visible ? "translate-y-0 opacity-100 scale-100" : "translate-y-8 opacity-0 scale-95"}`}>
+        <div className={`mx-auto max-w-3xl rounded-2xl border border-accent/30 bg-accent/10 p-8 backdrop-blur-sm transition-all duration-700 delay-[600ms] ${visible ? "translate-y-0 opacity-100 scale-100" : "translate-y-8 opacity-0 scale-95"}`}>
           <h3 className="mb-6 text-center text-xl font-bold text-accent">
-            취업 연계 지원
+            이런 경험을 하게 됩니다
           </h3>
           <div className="grid gap-5 md:grid-cols-2">
             <div className="flex items-start gap-4 rounded-xl bg-white/10 p-5">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/20">
-                <FileText className="h-5 w-5 text-accent" />
+                <Building2 className="h-5 w-5 text-accent" />
               </div>
               <div>
-                <p className="break-keep font-semibold">이력서·자기소개서 1:1 첨삭</p>
-                <p className="mt-1 break-keep text-sm text-white/60">전문가의 맞춤형 피드백</p>
+                <p className="break-keep font-semibold">실제 이커머스 기업에 배치</p>
+                <p className="mt-1 break-keep text-sm text-white/60">교육이 아닌 실제 회사에서 근무</p>
               </div>
             </div>
             <div className="flex items-start gap-4 rounded-xl bg-white/10 p-5">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/20">
-                <FolderOpen className="h-5 w-5 text-accent" />
+                <Laptop className="h-5 w-5 text-accent" />
               </div>
               <div>
-                <p className="break-keep font-semibold">프로젝트 기반 포트폴리오 완성</p>
-                <p className="mt-1 break-keep text-sm text-white/60">실무 역량을 증명하는 결과물</p>
+                <p className="break-keep font-semibold">현장 실무를 직접 수행</p>
+                <p className="mt-1 break-keep text-sm text-white/60">상품 등록·광고 운영·성과 분석 등</p>
               </div>
             </div>
             <div className="flex items-start gap-4 rounded-xl bg-white/10 p-5">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/20">
-                <HeadphonesIcon className="h-5 w-5 text-accent" />
+                <FileCheck className="h-5 w-5 text-accent" />
               </div>
               <div>
-                <p className="break-keep font-semibold">전담 퍼실리테이터 취업 상담</p>
-                <p className="mt-1 break-keep text-sm text-white/60">교육 기간 내 지속적 지원</p>
+                <p className="break-keep font-semibold">이력서에 경력으로 기재 가능</p>
+                <p className="mt-1 break-keep text-sm text-white/60">3개월 실무 경험이 경력이 됩니다</p>
               </div>
             </div>
             <div className="flex items-start gap-4 rounded-xl bg-white/10 p-5">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/20">
-                <BadgeCheck className="h-5 w-5 text-accent" />
+                <TrendingUp className="h-5 w-5 text-accent" />
               </div>
               <div>
-                <p className="break-keep font-semibold">유급 인턴 및 취업 연계</p>
-                <p className="mt-1 break-keep text-sm text-white/60">수료 후 실무 경험 기회 제공</p>
+                <p className="break-keep font-semibold">정규직 전환 기회 제공</p>
+                <p className="mt-1 break-keep text-sm text-white/60">성과 우수 인턴 대상 채용 연계</p>
               </div>
             </div>
           </div>
