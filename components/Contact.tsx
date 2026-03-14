@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { PROGRAM } from "@/lib/constants";
 import Link from "next/link";
-import { APPLY_URL, isApplicationOpen } from "@/lib/utils";
+import { isApplicationOpen } from "@/lib/utils";
 import { Phone, Mail, ArrowRight, MapPin } from "lucide-react";
 
 export default function Contact() {
@@ -60,13 +60,13 @@ export default function Contact() {
         </p>
 
         {open && (
-          <Link
-            href={APPLY_URL}
+          <a
+            href="#apply"
             className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-8 py-4 text-lg font-bold transition-colors hover:bg-primary-500"
           >
             지금 신청하기
             <ArrowRight className="h-5 w-5" />
-          </Link>
+          </a>
         )}
 
         <div className="mt-12 border-t border-white/10 pt-8">
