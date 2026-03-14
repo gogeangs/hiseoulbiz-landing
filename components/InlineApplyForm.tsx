@@ -218,6 +218,36 @@ export default function InlineApplyForm() {
             )}
           </button>
         </form>
+
+        {/* 접수 후 진행 프로세스 */}
+        <div className="mt-8 flex items-start justify-between px-2">
+          {[
+            { step: "1", label: "간편 신청", sub: "지금 여기!", active: true },
+            { step: "2", label: "신청서 제출", sub: "이메일 안내" },
+            { step: "3", label: "면접", sub: PROGRAM.interviewDate?.replace("2026년 ", "") || "4월 초" },
+            { step: "4", label: "최종 선발", sub: "개별 통보" },
+          ].map((item, i) => (
+            <div key={i} className="flex flex-1 flex-col items-center">
+              <div className="flex w-full items-center">
+                {i > 0 && <div className={`h-px flex-1 ${item.active ? "bg-accent" : "bg-gray-300"}`} />}
+                <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                  item.active
+                    ? "bg-accent text-primary-950"
+                    : "bg-gray-200 text-gray-500"
+                }`}>
+                  {item.step}
+                </div>
+                {i < 3 && <div className="h-px flex-1 bg-gray-300" />}
+              </div>
+              <p className={`mt-2 text-center text-xs font-medium ${item.active ? "text-accent-dark text-primary-800" : "text-gray-500"}`}>
+                {item.label}
+              </p>
+              <p className={`text-center text-[11px] ${item.active ? "font-semibold text-accent" : "text-gray-400"}`}>
+                {item.sub}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
