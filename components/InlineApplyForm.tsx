@@ -29,6 +29,10 @@ export default function InlineApplyForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setTouched({ name: true, phone: true, email: true });
+    if (!validations.name || !validations.phone || !validations.email) {
+      return;
+    }
     setSubmitting(true);
     setError(null);
 
