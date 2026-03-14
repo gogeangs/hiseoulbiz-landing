@@ -55,34 +55,39 @@ export const BENEFITS = [
 export const CURRICULUM = [
   {
     title: "글로벌 이커머스 플랫폼 운영·마케팅 실무",
+    subtitle: "쇼피파이·아마존에 상품을 직접 등록하고 운영합니다",
     hours: 126,
-    percentage: 36,
-  },
-  {
-    title: "취업 준비 교육",
-    subtitle: "스마트워크, 이력서, 자기소개서 등",
-    hours: 70,
-    percentage: 20,
-  },
-  {
-    title: "팀·개인 프로젝트",
-    hours: 49,
-    percentage: 14,
+    phase: "실무 이해",
   },
   {
     title: "이커머스 및 무역 실무",
+    subtitle: "해외 거래 프로세스와 물류 흐름을 이해합니다",
     hours: 42,
-    percentage: 12,
-  },
-  {
-    title: "디지털 마케팅 전략 및 성과 분석",
-    hours: 35,
-    percentage: 10,
+    phase: "실무 이해",
   },
   {
     title: "이커머스 플랫폼 콘텐츠 기획 및 제작",
+    subtitle: "판매를 이끄는 상세페이지와 광고 소재를 만듭니다",
     hours: 28,
-    percentage: 8,
+    phase: "실행",
+  },
+  {
+    title: "디지털 마케팅 전략 및 성과 분석",
+    subtitle: "광고를 세팅하고 ROAS 기반으로 최적화합니다",
+    hours: 35,
+    phase: "실행",
+  },
+  {
+    title: "팀·개인 프로젝트",
+    subtitle: "배운 것을 종합해 포트폴리오를 완성합니다",
+    hours: 49,
+    phase: "결과물",
+  },
+  {
+    title: "취업 준비 교육",
+    subtitle: "이력서·자소서 첨삭과 모의 면접으로 마무리합니다",
+    hours: 70,
+    phase: "취업 연결",
   },
 ];
 
