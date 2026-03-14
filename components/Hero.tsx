@@ -70,7 +70,7 @@ export default function Hero() {
         {open ? (
           <a
             href="#apply"
-            className="inline-flex items-center gap-2 rounded-xl bg-white px-10 py-5 text-xl font-bold text-primary-800 shadow-lg transition-all hover:bg-primary-50 hover:shadow-xl"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent-light px-10 py-5 text-xl font-bold text-primary-950 shadow-lg transition-all hover:shadow-xl hover:brightness-110"
           >
             지금 신청하기
             <ArrowRight className="h-6 w-6" />

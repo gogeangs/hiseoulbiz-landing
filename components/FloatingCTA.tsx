@@ -39,7 +39,7 @@ export default function FloatingCTA() {
     >
       <a
         href="#apply"
-        className="mx-auto flex max-w-md items-center justify-center gap-2 rounded-xl bg-primary-700 py-4 text-lg font-bold text-white shadow-2xl transition-colors hover:bg-primary-800"
+        className="mx-auto flex max-w-md items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary-700 to-primary-500 py-4 text-lg font-bold text-white shadow-2xl transition-all hover:shadow-3xl hover:brightness-110"
       >
         신청하기
         <ArrowRight className="h-5 w-5" />

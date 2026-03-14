@@ -44,8 +44,8 @@ export default function InternshipInfo() {
           </div>
           <div className={`rounded-2xl bg-white/10 p-6 text-center backdrop-blur-sm transition-all duration-700 delay-300 ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
             <p className="mb-1 text-sm text-white/70">월 급여 (세전)</p>
-            <p className="whitespace-nowrap text-xl font-bold md:text-2xl">
-              {PROGRAM.internSalary}원
+            <p className="whitespace-nowrap text-2xl font-bold md:text-3xl">
+              {PROGRAM.internSalary}<span className="text-lg">원</span>
             </p>
             <p className="mt-1 text-sm text-white/70">× {PROGRAM.internMonths}개월</p>
           </div>
@@ -106,7 +106,7 @@ export default function InternshipInfo() {
           {open ? (
             <a
               href="#apply"
-              className="inline-flex items-center gap-2 rounded-xl bg-accent px-8 py-4 text-lg font-bold text-primary-950 transition-colors hover:bg-yellow-400"
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent-light px-8 py-4 text-lg font-bold text-primary-950 transition-all hover:brightness-110 hover:shadow-lg"
             >
               지금 신청하기
               <ArrowRight className="h-5 w-5" />

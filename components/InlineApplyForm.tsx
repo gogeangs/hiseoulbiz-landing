@@ -196,7 +196,7 @@ export default function InlineApplyForm() {
           <button
             type="submit"
             disabled={submitting || !privacyConsent}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-primary-700 py-4 text-lg font-bold text-white transition-colors hover:bg-primary-800 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary-700 to-primary-500 py-4 text-lg font-bold text-white shadow-lg transition-all hover:shadow-xl hover:brightness-110 disabled:cursor-not-allowed disabled:bg-none disabled:bg-gray-300 disabled:text-gray-500 disabled:shadow-none"
           >
             {submitting ? (
               <>
