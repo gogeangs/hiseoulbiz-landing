@@ -2,12 +2,15 @@
 
 import { useState } from "react";
 import { isApplicationOpen } from "@/lib/utils";
-import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { useCountdown } from "@/hooks/useCountdown";
+import { DEADLINE_ISO, PROGRAM } from "@/lib/constants";
+import { Loader2, CheckCircle2, AlertCircle, Clock, Users } from "lucide-react";
 import { trackLead } from "@/lib/fbq";
 import Link from "next/link";
 
 export default function InlineApplyForm() {
   const open = isApplicationOpen();
+  const { days, mounted } = useCountdown(DEADLINE_ISO);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -75,6 +78,22 @@ export default function InlineApplyForm() {
   return (
     <section id="apply" className="bg-primary-50 py-16 md:py-20">
       <div className="mx-auto max-w-2xl px-4">
+        {mounted && days <= 14 && (
+          <div className={`mb-6 flex items-center justify-center gap-4 rounded-xl px-4 py-3 text-sm font-medium ${
+            days <= 3 ? "bg-red-100 text-red-700" : "bg-amber-50 text-amber-700"
+          }`}>
+            <span className="flex items-center gap-1.5">
+              <Clock className="h-4 w-4" />
+              마감까지 <strong>D-{days}일</strong>
+            </span>
+            <span className="text-current/50">|</span>
+            <span className="flex items-center gap-1.5">
+              <Users className="h-4 w-4" />
+              선착순 <strong>{PROGRAM.capacity}명</strong>
+            </span>
+          </div>
+        )}
+
         <div className="mb-8 text-center">
           <h2 className="mb-2 text-2xl font-bold text-primary-900 md:text-3xl">
             간편 신청

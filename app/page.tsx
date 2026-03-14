@@ -12,6 +12,7 @@ import PointBanner from "@/components/PointBanner";
 import Contact from "@/components/Contact";
 import FloatingCTA from "@/components/FloatingCTA";
 import InlineApplyForm from "@/components/InlineApplyForm";
+import Outcomes from "@/components/Outcomes";
 
 export default function Home() {
   return (
@@ -22,6 +23,7 @@ export default function Home() {
         <Hero />
         <InlineApplyForm />
         <Benefits />
+        <Outcomes />
         <PointBanner />
         <InternshipInfo />
         <ProgramOverview />
