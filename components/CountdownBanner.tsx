@@ -1,9 +1,7 @@
 "use client";
 
 import { useCountdown } from "@/hooks/useCountdown";
-import Link from "next/link";
 import { DEADLINE_ISO } from "@/lib/constants";
-import { APPLY_URL } from "@/lib/utils";
 
 export default function CountdownBanner() {
   const { days, hours, minutes, seconds, isExpired, mounted } =
@@ -26,8 +24,8 @@ export default function CountdownBanner() {
   }
 
   return (
-    <Link
-      href={APPLY_URL}
+    <a
+      href="#apply"
       className="block bg-primary-700 py-2.5 text-center text-sm font-medium text-white transition-colors hover:bg-primary-600"
     >
       <span className="hidden sm:inline">모집 마감까지 </span>
@@ -37,6 +35,6 @@ export default function CountdownBanner() {
       </span>
       <span className="ml-2 hidden sm:inline">| 지금 신청하기 →</span>
       <span className="ml-2 sm:hidden">→ 신청하기</span>
-    </Link>
+    </a>
   );
 }

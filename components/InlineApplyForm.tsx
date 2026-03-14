@@ -15,8 +15,17 @@ export default function InlineApplyForm() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [touched, setTouched] = useState({ name: false, phone: false, email: false });
 
   if (!open) return null;
+
+  const phoneRegex = /^01[016789]-?\d{3,4}-?\d{4}$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const validations = {
+    name: name.trim().length >= 1,
+    phone: phoneRegex.test(phone.trim()),
+    email: emailRegex.test(email.trim()),
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,10 +89,18 @@ export default function InlineApplyForm() {
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                onBlur={() => setTouched((p) => ({ ...p, name: true }))}
                 placeholder="홍길동"
                 required
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+                className={`w-full rounded-lg border px-4 py-3 text-sm transition-colors focus:outline-none focus:ring-2 ${
+                  touched.name && !validations.name
+                    ? "border-red-400 focus:border-red-500 focus:ring-red-100"
+                    : "border-gray-300 focus:border-primary-500 focus:ring-primary-100"
+                }`}
               />
+              {touched.name && !validations.name && (
+                <p className="mt-1 text-xs text-red-500">이름을 입력해 주세요.</p>
+              )}
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-medium text-gray-700">
@@ -92,11 +109,19 @@ export default function InlineApplyForm() {
               <input
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
+                onBlur={() => setTouched((p) => ({ ...p, phone: true }))}
                 placeholder="010-1234-5678"
                 inputMode="tel"
                 required
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+                className={`w-full rounded-lg border px-4 py-3 text-sm transition-colors focus:outline-none focus:ring-2 ${
+                  touched.phone && !validations.phone
+                    ? "border-red-400 focus:border-red-500 focus:ring-red-100"
+                    : "border-gray-300 focus:border-primary-500 focus:ring-primary-100"
+                }`}
               />
+              {touched.phone && !validations.phone && (
+                <p className="mt-1 text-xs text-red-500">올바른 연락처를 입력해 주세요.</p>
+              )}
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-medium text-gray-700">
@@ -105,11 +130,19 @@ export default function InlineApplyForm() {
               <input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onBlur={() => setTouched((p) => ({ ...p, email: true }))}
                 type="email"
                 placeholder="example@email.com"
                 required
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+                className={`w-full rounded-lg border px-4 py-3 text-sm transition-colors focus:outline-none focus:ring-2 ${
+                  touched.email && !validations.email
+                    ? "border-red-400 focus:border-red-500 focus:ring-red-100"
+                    : "border-gray-300 focus:border-primary-500 focus:ring-primary-100"
+                }`}
               />
+              {touched.email && !validations.email && (
+                <p className="mt-1 text-xs text-red-500">올바른 이메일을 입력해 주세요.</p>
+              )}
             </div>
           </div>
 

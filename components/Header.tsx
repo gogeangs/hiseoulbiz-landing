@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import { APPLY_URL, isApplicationOpen } from "@/lib/utils";
+import { isApplicationOpen } from "@/lib/utils";
 import { PROGRAM } from "@/lib/constants";
 
 export default function Header() {
@@ -36,12 +35,12 @@ export default function Header() {
           {PROGRAM.title}
         </span>
         {open ? (
-          <Link
-            href={APPLY_URL}
+          <a
+            href="#apply"
             className="shrink-0 rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-800"
           >
             신청하기
-          </Link>
+          </a>
         ) : (
           <span className="shrink-0 rounded-lg bg-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-500">
             모집 마감

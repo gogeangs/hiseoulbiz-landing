@@ -20,6 +20,7 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
+        <InlineApplyForm />
         <Benefits />
         <PointBanner />
         <InternshipInfo />
@@ -28,7 +29,6 @@ export default function Home() {
         <Eligibility />
         <Timeline />
         <FAQ />
-        <InlineApplyForm />
       </main>
       <Contact />
       <FloatingCTA />
