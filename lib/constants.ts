@@ -31,26 +31,6 @@ export const PROGRAM = {
   },
 };
 
-export const BENEFITS = [
-  {
-    label: "실무 중심 교육",
-    value: "350시간",
-    description: "현직자 강사진의 실전 프로젝트 기반 커리큘럼",
-    icon: "GraduationCap" as const,
-  },
-  {
-    label: "교육 수당 지급",
-    value: "일 25,000원",
-    description: "80% 이상 출석 시 지급 (최대 약 125만원)",
-    icon: "Wallet" as const,
-  },
-  {
-    label: "유급 인턴 연계",
-    value: "3개월",
-    description: "우수 수료자 대상 월 253만원 유급 인턴십",
-    icon: "Briefcase" as const,
-  },
-];
 
 export const CURRICULUM = [
   {
@@ -91,12 +71,6 @@ export const CURRICULUM = [
   },
 ];
 
-export const ELIGIBILITY = [
-  "만 18세 이상 ~ 만 39세 이하",
-  "서울시 거주 구직자 (졸업 예정자 가능, 재학생 지원 불가)",
-  "글로벌 세일즈 & 이커머스 분야 취업 희망자",
-  "개인 노트북 필수 지참 (전 과정 노트북 활용 교육 & 실습 진행)",
-];
 
 export const BONUS_TARGETS = [
   "장애인",
