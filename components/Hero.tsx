@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { PROGRAM } from "@/lib/constants";
 import { isApplicationOpen } from "@/lib/utils";
-import { ArrowRight, Users, CalendarClock } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function Hero() {
   const open = isApplicationOpen();
@@ -38,64 +38,67 @@ export default function Hero() {
       </div>
 
       <div className="relative mx-auto max-w-6xl px-4 text-center">
+        {/* 기관 배지 */}
         <div className="mb-8 inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-2.5 text-base backdrop-blur-sm md:text-lg">
           <span className="font-medium">{PROGRAM.organizer}</span>
           <span className="text-white/60">|</span>
           <span>{PROGRAM.project}</span>
         </div>
 
-        <h1 className="mb-6 text-4xl font-bold leading-tight md:text-6xl lg:text-7xl md:leading-tight">
-          교육비 무료, 수당까지<br />
-          이커머스 실무 과정
+        {/* 결과형 제목 */}
+        <h1 className="mb-6 break-keep text-4xl font-bold leading-tight md:text-6xl lg:text-7xl md:leading-tight">
+          서울 청년 구직자를 위한<br />
+          글로벌 이커머스 취업 실무 과정
         </h1>
 
-        <p className="mx-auto mb-8 max-w-2xl text-xl text-white/80 md:text-2xl">
-          350시간 현직자 실무 교육 + 일 2.5만원 수당
-          <br className="hidden sm:block" />
-          수료 후 월 253만원 유급 인턴십 연계
+        {/* 여정 요약 서브카피 */}
+        <p className="mx-auto mb-4 max-w-2xl break-keep text-xl text-white/80 md:text-2xl">
+          350시간 실무교육 → 포트폴리오 완성 → 유급 인턴 연계
+        </p>
+        <p className="mx-auto mb-8 max-w-2xl text-lg text-white/60 md:text-xl">
+          수당 지급 · 교육비 전액 무료
         </p>
 
+        {/* 대상 + 혜택 배지 */}
         <div className="mb-10 flex flex-wrap justify-center gap-3 md:gap-4">
           <span className="rounded-full bg-accent px-5 py-2.5 text-base font-semibold text-primary-950 md:text-lg">
-            교육비 전액 무료
+            만 18~39세 서울 거주
           </span>
           <span className="rounded-full bg-white/15 px-5 py-2.5 text-base font-semibold backdrop-blur-sm md:text-lg">
-            일 25,000원 수당
+            교육비 0원 + 수당 지급
           </span>
           <span className="rounded-full bg-white/15 px-5 py-2.5 text-base font-semibold backdrop-blur-sm md:text-lg">
-            3개월 유급 인턴
+            수료 후 유급 인턴 연계
           </span>
         </div>
 
+        {/* 긴급성 + CTA */}
         {open ? (
-          <a
-            href="#apply"
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent-light px-10 py-5 text-xl font-bold text-primary-950 shadow-lg transition-all hover:shadow-xl hover:brightness-110"
-          >
-            지금 신청하기
-            <ArrowRight className="h-6 w-6" />
-          </a>
+          <div className="flex flex-col items-center gap-4">
+            <p className="text-base font-medium text-white/90 md:text-lg">
+              <span className="text-accent">{PROGRAM.capacity}명</span> 소수 선발 · {PROGRAM.deadline} 마감
+            </p>
+            <a
+              href="#apply"
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent-light px-10 py-5 text-xl font-bold text-primary-950 shadow-lg transition-all hover:shadow-xl hover:brightness-110"
+            >
+              지금 신청하기
+              <ArrowRight className="h-6 w-6" />
+            </a>
+            <p className="text-sm text-white/50">
+              간편 신청 후 이메일로 신청서를 안내드립니다
+            </p>
+            {applicantCount !== null && applicantCount > 0 && (
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-accent backdrop-blur-sm">
+                현재 {applicantCount}명 신청 완료
+              </span>
+            )}
+          </div>
         ) : (
           <span className="inline-flex items-center gap-2 rounded-xl bg-gray-300 px-10 py-5 text-xl font-bold text-gray-500">
             모집이 마감되었습니다
           </span>
         )}
-
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-base text-white/70 md:text-lg">
-          <span className="flex items-center gap-2">
-            <CalendarClock className="h-5 w-5" />
-            신청 마감: {PROGRAM.deadline}
-          </span>
-          <span className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            선발 인원: {PROGRAM.capacity}명
-          </span>
-          {applicantCount !== null && applicantCount > 0 && (
-            <span className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 font-medium text-accent backdrop-blur-sm">
-              현재 {applicantCount}명 신청 완료
-            </span>
-          )}
-        </div>
       </div>
     </section>
   );
