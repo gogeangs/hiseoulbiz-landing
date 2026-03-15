@@ -148,6 +148,43 @@ export function buildCompletionConfirmEmail(applicantName: string): string {
   `);
 }
 
+export function buildAdminNotifyEmail(data: { name: string; phone: string; email: string; utmSource?: string }): string {
+  const name = escapeHtml(data.name);
+  const phone = escapeHtml(data.phone);
+  const email = escapeHtml(data.email);
+  const source = data.utmSource ? escapeHtml(data.utmSource) : "직접 유입";
+  const now = new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" });
+
+  return emailLayout("신규 신청 알림", `
+        <p style="font-size:16px;color:#1e293b;margin:0 0 16px;">
+          새로운 교육 신청이 접수되었습니다.
+        </p>
+
+        <table width="100%" style="font-size:14px;color:#475569;border-collapse:collapse;margin:0 0 16px;">
+          <tr>
+            <td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600;background:#f8fafc;width:100px;">이름</td>
+            <td style="padding:10px 12px;border:1px solid #e2e8f0;">${name}</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600;background:#f8fafc;">연락처</td>
+            <td style="padding:10px 12px;border:1px solid #e2e8f0;">${phone}</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600;background:#f8fafc;">이메일</td>
+            <td style="padding:10px 12px;border:1px solid #e2e8f0;">${email}</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600;background:#f8fafc;">유입 경로</td>
+            <td style="padding:10px 12px;border:1px solid #e2e8f0;">${source}</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600;background:#f8fafc;">접수 시각</td>
+            <td style="padding:10px 12px;border:1px solid #e2e8f0;">${now}</td>
+          </tr>
+        </table>
+  `);
+}
+
 export function buildReminderEmail(applicantName: string, daysLeft: number): string {
   const name = escapeHtml(applicantName);
   const urgency = daysLeft <= 3;

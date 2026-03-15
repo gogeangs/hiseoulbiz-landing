@@ -5,7 +5,7 @@ import { applicationSchema } from "@/lib/validations";
 import { insertApplication, DuplicateEmailError, checkDuplicateEmail, markEmailSent, markEmailFailed } from "@/lib/db";
 import { DEADLINE_ISO } from "@/lib/constants";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { buildApplicationGuideEmail } from "@/lib/email-template";
+import { buildApplicationGuideEmail, buildAdminNotifyEmail } from "@/lib/email-template";
 import { sendMail } from "@/lib/mailer";
 
 // 첨부파일 모듈 레벨 캐시
@@ -124,6 +124,16 @@ export async function POST(request: NextRequest) {
       console.error("Auto email send failed:", emailError);
       const errMsg = emailError instanceof Error ? emailError.message : "발송 실패";
       await markEmailFailed([insertedId], errMsg).catch(() => {});
+    }
+
+    // 관리자 알림 이메일 (실패해도 신청 성공에 영향 없음)
+    const adminEmail = process.env.ADMIN_NOTIFY_EMAIL;
+    if (adminEmail) {
+      sendMail({
+        to: adminEmail,
+        subject: `[신규 신청] ${formData.name}님이 교육을 신청했습니다`,
+        html: buildAdminNotifyEmail({ ...formData, utmSource: utmSource || undefined }),
+      }).catch((err) => console.error("Admin notify email failed:", err));
     }
 
     return NextResponse.json({ success: true });
