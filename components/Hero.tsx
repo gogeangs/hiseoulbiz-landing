@@ -47,8 +47,7 @@ export default function Hero() {
 
         {/* 결과형 제목 */}
         <h1 className="mb-6 break-keep text-4xl font-bold leading-tight md:text-6xl lg:text-7xl md:leading-tight">
-          서울 청년 구직자를 위한<br />
-          글로벌 이커머스 취업 실무 과정
+          {PROGRAM.title}
         </h1>
 
         {/* 여정 요약 서브카피 */}
