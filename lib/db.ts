@@ -30,6 +30,7 @@ export interface ApplicationRow {
   completed_at: string | null;
   rejected_at: string | null;
   memo: string | null;
+  contact_status: string | null;
   utm_source: string;
   utm_medium: string;
   utm_campaign: string;
@@ -232,6 +233,14 @@ export async function resetEmailStatus(id: number): Promise<boolean> {
   const sql = getSQL();
   const rows = await sql`
     UPDATE applications SET email_sent_at = NULL, email_error = NULL WHERE id = ${id} RETURNING id
+  `;
+  return rows.length > 0;
+}
+
+export async function updateContactStatus(id: number, status: string | null): Promise<boolean> {
+  const sql = getSQL();
+  const rows = await sql`
+    UPDATE applications SET contact_status = ${status} WHERE id = ${id} RETURNING id
   `;
   return rows.length > 0;
 }

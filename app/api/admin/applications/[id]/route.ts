@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminToken } from "@/lib/auth";
-import { updateApplication, deleteApplication, toggleCompleted, toggleSmsSent, toggleRejected, checkDuplicateEmail, getApplicationsByIds, updateMemo, resetEmailStatus } from "@/lib/db";
+import { updateApplication, deleteApplication, toggleCompleted, toggleSmsSent, toggleRejected, checkDuplicateEmail, getApplicationsByIds, updateMemo, updateContactStatus, resetEmailStatus } from "@/lib/db";
 import { applicationSchema } from "@/lib/validations";
 import { buildCompletionConfirmEmail } from "@/lib/email-template";
 import { sendMail } from "@/lib/mailer";
@@ -128,6 +128,26 @@ export async function PATCH(
         );
       }
       return NextResponse.json({ success: true });
+    }
+
+    // 연락 상태 업데이트
+    if (field === "contact_status") {
+      const status = (body as { status?: string }).status || null;
+      const validStatuses = [null, "absent", "prospect"];
+      if (!validStatuses.includes(status)) {
+        return NextResponse.json(
+          { error: "유효하지 않은 상태입니다." },
+          { status: 400 }
+        );
+      }
+      const updated = await updateContactStatus(id, status);
+      if (!updated) {
+        return NextResponse.json(
+          { error: "해당 신청자를 찾을 수 없습니다." },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({ success: true, contactStatus: status });
     }
 
     // 이메일 상태 초기화

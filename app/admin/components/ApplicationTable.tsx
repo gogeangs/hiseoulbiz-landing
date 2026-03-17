@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Search, Download, Loader2, Mail, X, Plus, Pencil, Trash2, CircleCheck, Circle, ChevronLeft, ChevronRight, MessageSquare, UserX } from "lucide-react";
+import { Search, Download, Loader2, Mail, X, Plus, Pencil, Trash2, CircleCheck, Circle, ChevronLeft, ChevronRight, MessageSquare, UserX, Phone } from "lucide-react";
 import { SEOUL_DISTRICTS } from "@/lib/validations";
 import { BONUS_TARGETS } from "@/lib/constants";
 import type { ApplicationRow } from "@/lib/db";
@@ -78,6 +78,8 @@ export default function ApplicationTable({
   const [togglingSmsId, setTogglingSmsId] = useState<number | null>(null);
   const [resettingEmailId, setResettingEmailId] = useState<number | null>(null);
   const [rejectingId, setRejectingId] = useState<number | null>(null);
+  const [contactStatusFilter, setContactStatusFilter] = useState<"" | "absent" | "prospect" | "none">("");
+  const [togglingContactId, setTogglingContactId] = useState<number | null>(null);
 
   // 페이지네이션
   const PAGE_SIZE = 20;
@@ -109,6 +111,9 @@ export default function ApplicationTable({
     if (sentFilter === "unsent" && (app.email_sent_at || app.email_error)) return false;
     if (completedFilter === "completed" && !app.completed_at) return false;
     if (completedFilter === "uncompleted" && app.completed_at) return false;
+    if (contactStatusFilter === "absent" && app.contact_status !== "absent") return false;
+    if (contactStatusFilter === "prospect" && app.contact_status !== "prospect") return false;
+    if (contactStatusFilter === "none" && app.contact_status !== null) return false;
     return true;
   });
 
@@ -116,7 +121,7 @@ export default function ApplicationTable({
   const safePage = Math.min(currentPage, totalPages);
   const paged = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
-  const hasActiveFilter = !!(search || district || sentFilter || completedFilter);
+  const hasActiveFilter = !!(search || district || sentFilter || completedFilter || contactStatusFilter);
 
   const handleToggleSms = async (id: number) => {
     setTogglingSmsId(id);
@@ -189,6 +194,30 @@ export default function ApplicationTable({
       alert("처리 중 오류가 발생했습니다.");
     } finally {
       setRejectingId(null);
+    }
+  };
+
+  const handleCycleContactStatus = async (id: number, current: string | null) => {
+    const nextStatus = current === null ? "absent" : current === "absent" ? "prospect" : null;
+    setTogglingContactId(id);
+    try {
+      const res = await fetch(`/api/admin/applications/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ field: "contact_status", status: nextStatus }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        alert(data?.error || "처리에 실패했습니다.");
+        return;
+      }
+      startTransition(() => {
+        router.refresh();
+      });
+    } catch {
+      alert("처리 중 오류가 발생했습니다.");
+    } finally {
+      setTogglingContactId(null);
     }
   };
 
@@ -455,6 +484,7 @@ export default function ApplicationTable({
       "가점대상",
       "신청일시",
       "유입경로",
+      "연락상태",
       "이메일발송",
       "문자발송",
       "제출완료",
@@ -469,6 +499,7 @@ export default function ApplicationTable({
       app.bonus_targets?.join(", ") ?? "",
       new Date(app.submitted_at).toLocaleString("ko-KR"),
       app.utm_source || "직접",
+      app.contact_status === "absent" ? "부재중" : app.contact_status === "prospect" ? "가망고객" : "",
       app.email_sent_at
         ? new Date(app.email_sent_at).toLocaleString("ko-KR")
         : "미발송",
@@ -628,6 +659,7 @@ export default function ApplicationTable({
                   setDistrict("");
                   setSentFilter("");
                   setCompletedFilter("");
+                  setContactStatusFilter("");
                   applyFilters("", "");
                 }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
@@ -667,6 +699,16 @@ export default function ApplicationTable({
             <option value="">제출 전체</option>
             <option value="completed">제출완료</option>
             <option value="uncompleted">미제출</option>
+          </select>
+          <select
+            value={contactStatusFilter}
+            onChange={(e) => { setContactStatusFilter(e.target.value as "" | "absent" | "prospect" | "none"); setSelectedIds(new Set()); setCurrentPage(1); }}
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+          >
+            <option value="">연락 전체</option>
+            <option value="none">미연락</option>
+            <option value="absent">부재중</option>
+            <option value="prospect">가망고객</option>
           </select>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -731,6 +773,7 @@ export default function ApplicationTable({
               <th className="px-2 py-3 font-medium text-gray-500">가점대상</th>
               <th className="px-2 py-3 font-medium text-gray-500">유입경로</th>
               <th className="px-2 py-3 font-medium text-gray-500">신청일시</th>
+              <th className="w-16 px-2 py-3 text-center font-medium text-gray-500">연락</th>
               <th className="w-16 px-2 py-3 text-center font-medium text-gray-500">메일</th>
               <th className="w-12 px-2 py-3 text-center font-medium text-gray-500">문자</th>
               <th className="w-12 px-2 py-3 text-center font-medium text-gray-500">제출</th>
@@ -742,7 +785,7 @@ export default function ApplicationTable({
             {paged.length === 0 ? (
               <tr>
                 <td
-                  colSpan={15}
+                  colSpan={16}
                   className="px-2 py-12 text-center text-gray-400"
                 >
                   {hasActiveFilter
@@ -807,6 +850,24 @@ export default function ApplicationTable({
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
+                  </td>
+                  <td className="px-2 py-3 text-center">
+                    <button
+                      onClick={() => handleCycleContactStatus(app.id, app.contact_status)}
+                      disabled={togglingContactId === app.id}
+                      className="inline-flex items-center gap-1 disabled:opacity-50"
+                      title={app.contact_status === "absent" ? "부재중 → 가망고객" : app.contact_status === "prospect" ? "가망고객 → 초기화" : "미연락 → 부재중"}
+                    >
+                      {togglingContactId === app.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                      ) : app.contact_status === "absent" ? (
+                        <span className="inline-block rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600">부재중</span>
+                      ) : app.contact_status === "prospect" ? (
+                        <span className="inline-block rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-600">가망</span>
+                      ) : (
+                        <Phone className="h-4 w-4 text-gray-300 hover:text-gray-400" />
+                      )}
+                    </button>
                   </td>
                   <td className="px-2 py-3 text-center">
                     {resettingEmailId === app.id ? (
