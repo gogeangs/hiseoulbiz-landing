@@ -4,6 +4,8 @@ function escapeHtml(str: string): string {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;");
 }
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://hiseoulbiz-landing.vercel.app";
+
 function emailLayout(title: string, body: string): string {
   return `<!DOCTYPE html>
 <html lang="ko">
@@ -26,6 +28,7 @@ function emailLayout(title: string, body: string): string {
     </tr>
     <tr>
       <td style="background:#f8fafc;padding:20px 24px;text-align:center;border-top:1px solid #e2e8f0;">
+        <a href="${SITE_URL}" style="display:inline-block;background:#1e3a5f;color:#fff;font-size:14px;font-weight:600;text-decoration:none;padding:10px 24px;border-radius:8px;margin:0 0 12px;">과정 상세 보기</a>
         <p style="font-size:12px;color:#94a3b8;margin:0;">
           &copy; (사)하이서울기업협회 | 본 메일은 발신 전용입니다.
         </p>
