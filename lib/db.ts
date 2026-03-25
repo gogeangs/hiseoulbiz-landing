@@ -198,7 +198,7 @@ export async function getUncompletedApplications(): Promise<ApplicationRow[]> {
   const sql = getSQL();
   const rows = await sql`
     SELECT * FROM applications
-    WHERE completed_at IS NULL AND email_sent_at IS NOT NULL
+    WHERE completed_at IS NULL AND email_sent_at IS NOT NULL AND rejected_at IS NULL
     ORDER BY submitted_at DESC
   `;
   return rows as ApplicationRow[];
